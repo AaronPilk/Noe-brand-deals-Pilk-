@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Noe Varner — Partnerships</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230071e3'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='-apple-system,sans-serif' font-weight='700'>N</text></svg>" />
+<link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+<div id="app" class="app">
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">N</div>
+      <div class="brand-text">
+        <div class="brand-name">Noe Varner</div>
+        <div class="brand-sub">Partnerships OS</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="nav"></nav>
+    <div class="sidebar-foot">
+      <button class="nav-item" id="theme-toggle" title="Toggle appearance">
+        <span class="nav-ico" id="theme-ico">◐</span><span class="nav-label">Appearance</span>
+      </button>
+      <button class="nav-item" id="collapse-toggle" title="Collapse sidebar">
+        <span class="nav-ico">⟨</span><span class="nav-label">Collapse</span>
+      </button>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn mobile-menu" id="mobile-menu">☰</button>
+        <div class="crumbs" id="crumbs"></div>
+      </div>
+      <div class="topbar-right">
+        <button class="searchbar" id="open-cmdk">
+          <span class="search-ico">⌕</span>
+          <span class="search-hint">Search deals, brands, drafts…</span>
+          <kbd>⌘K</kbd>
+        </button>
+        <div class="sync-pill" id="sync-pill" title="Data source status"></div>
+      </div>
+    </header>
+    <main class="workspace" id="view"></main>
+  </div>
+</div>
+
+<div class="cmdk-overlay" id="cmdk" hidden>
+  <div class="cmdk">
+    <input id="cmdk-input" class="cmdk-input" type="text" placeholder="Search deals, brands, contacts, drafts, actions…" autocomplete="off" spellcheck="false" />
+    <div class="cmdk-results" id="cmdk-results"></div>
+    <div class="cmdk-foot"><span>↑↓ navigate</span><span>↵ open</span><span>esc close</span></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="data/nv-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/views.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

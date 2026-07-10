@@ -1,0 +1,116 @@
+#!/usr/bin/env node
+/**
+ * build-data.mjs — compiles data/source/* into data/nv-data.js (window.NV_DATA).
+ * Pure local file processing; no network. Run: node scripts/build-data.mjs
+ */
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const src = (f) => join(root, 'data', 'source', f);
+
+// ---------- CSV parser (handles quoted fields, embedded newlines/commas) ----------
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQ = false;
+      } else field += c;
+    } else if (c === '"') inQ = true;
+    else if (c === ',') { row.push(field); field = ''; }
+    else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++;
+      row.push(field); field = '';
+      if (row.length > 1 || row[0] !== '') rows.push(row);
+      row = [];
+    } else field += c;
+  }
+  if (field !== '' || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+// ---------- Deals ----------
+const NUM = new Set(['total_score','explicit_cash_usd','market_value_base_usd','likely_close_usd','close_probability','prob_weighted_usd','hidden_rights_usd','days_since_contact','minimum_package_value','organic_posting_fee','production_fee','licensing_fee','paid_usage_fee','exclusivity_fee','total_recommended_opening_ask','minimum_acceptable_close']);
+const rows = parseCSV(readFileSync(src('ui-export.csv'), 'utf8'));
+const header = rows[0];
+const deals = rows.slice(1).map((r) => {
+  const d = {};
+  header.forEach((h, i) => {
+    if (!h) return;
+    const v = r[i] ?? '';
+    d[h] = NUM.has(h) ? (v === '' ? null : Number(v)) : v;
+  });
+  return d;
+});
+
+// Validation — fail loudly rather than silently ship bad data
+const ids = deals.map((d) => d.deal_id);
+const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
+const errors = [];
+if (deals.length !== 65) errors.push(`Expected 65 deals, got ${deals.length}`);
+if (dupes.length) errors.push(`Duplicate deal ids: ${dupes.join(', ')}`);
+for (const d of deals) {
+  if (!/^NV-DEAL-\d{4}$/.test(d.deal_id)) errors.push(`Bad id: ${d.deal_id}`);
+  if (d.close_probability > 1) errors.push(`${d.deal_id}: probability > 1`);
+  const pw = Math.round(d.likely_close_usd * d.close_probability);
+  if (Math.abs(pw - d.prob_weighted_usd) > 1) errors.push(`${d.deal_id}: prob_weighted mismatch (${pw} vs ${d.prob_weighted_usd})`);
+}
+if (errors.length) { console.error('VALIDATION FAILED:\n' + errors.join('\n')); process.exit(1); }
+
+// ---------- Drafts (templates + params -> full bodies, verbatim vs sheet) ----------
+const cfg = JSON.parse(readFileSync(src('drafts-config.json'), 'utf8'));
+const byId = Object.fromEntries(deals.map((d) => [d.deal_id, d]));
+const drafts = cfg.drafts.map((p) => {
+  const t = cfg.templates[p.template];
+  const deal = byId[p.dealId];
+  const brand = deal ? deal.brand : '';
+  const body = (t.prefix || '') + t.body.replaceAll('{name}', p.name) + cfg.signature;
+  return {
+    id: p.id, dealId: p.dealId, brand,
+    recipient: deal ? deal.contact_email : '',
+    responseType: t.label,
+    subject: t.subject.replaceAll('{brand}', brand),
+    body,
+    doNotSendUntil: cfg.doNotSendUntil,
+    templateKey: p.template,
+    exception: p.template === 'exception'
+  };
+});
+if (drafts.length !== 62) { console.error(`Expected 62 drafts, got ${drafts.length}`); process.exit(1); }
+
+// ---------- Follow-ups (join with deals) ----------
+const fu = JSON.parse(readFileSync(src('followups.json'), 'utf8'));
+const followups = fu.queue.map((q) => {
+  const d = byId[q.dealId];
+  return { dealId: q.dealId, brand: d.brand, priority: d.priority, grade: d.grade, days: d.days_since_contact, timing: q.timing, action: d.recommended_action, gmail: d.gmail_thread_url };
+});
+if (followups.length !== 57) { console.error(`Expected 57 follow-ups, got ${followups.length}`); process.exit(1); }
+
+const research = JSON.parse(readFileSync(src('research.json'), 'utf8'));
+const dashboard = JSON.parse(readFileSync(src('dashboard.json'), 'utf8'));
+const ratecard = JSON.parse(readFileSync(src('ratecard.json'), 'utf8'));
+
+const NV_DATA = {
+  meta: {
+    builtAt: new Date().toISOString(),
+    recordVersion: dashboard.recordVersion,
+    sourceSyncedAt: dashboard.syncedAt,
+    sourceSheet: dashboard.sourceSheet,
+    dealCount: deals.length,
+    draftCount: drafts.length,
+    followupCount: followups.length,
+    researchCount: research.brands.length,
+    validation: 'passed'
+  },
+  deals, drafts, followups,
+  research: research.brands,
+  dashboard, ratecard
+};
+
+writeFileSync(join(root, 'data', 'nv-data.js'), '// GENERATED by scripts/build-data.mjs — do not edit by hand.\nwindow.NV_DATA = ' + JSON.stringify(NV_DATA, null, 1) + ';\n');
+console.log(`OK: ${deals.length} deals, ${drafts.length} drafts, ${followups.length} follow-ups, ${research.brands.length} researched brands -> data/nv-data.js`);

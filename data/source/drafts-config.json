@@ -1,0 +1,112 @@
+{
+  "note": "Response Drafts tab (v3.0) encoded losslessly as templates + per-draft params. Bodies in the sheet are identical within a response type except the greeting name. Rebuilt by scripts/build-data.mjs. 62 drafts = 57 viable + 5 polite declines; 3 do-not-engage deals (0029, 0034, 0049) have no draft.",
+  "doNotSendUntil": "HOLD — review before sending",
+  "signature": "\n\nBest,\nAaron\nTalent Manager for Noe Varner",
+  "templates": {
+    "posted": {
+      "label": "Active — posted sponsorship (3-content package)",
+      "subject": "Re: Partnership with Noe Varner — {brand}",
+      "body": "Hi {name} — Aaron here. I manage Noe Varner's brand partnerships. Thanks for reaching out about working with Noe. Noe's sponsored partnerships generally begin with a three-content campaign — typically a product introduction, a demonstration or use-case piece, and a results/comparison post — which gives the brand enough repetition to introduce, demonstrate, and reinforce the message with his audience. The base investment for organic creation and posting starts at $3,000, with paid usage, licensing, whitelisting, exclusivity, and additional platforms quoted separately on top. To tailor a proposal, could you share your goals, target timeline, and whether you need any paid-media or usage rights beyond organic posting? I'll come back with a structured quote."
+    },
+    "exception": {
+      "label": "Strategic exception — EXCEPTION REQUIRES AARON APPROVAL",
+      "subject": "Re: Partnership with Noe Varner — {brand}",
+      "prefix": "[EXCEPTION REQUIRES AARON APPROVAL]\n\n",
+      "body": "Hi {name} — Aaron here. I manage Noe Varner's brand partnerships. Appreciate the outreach — this is an interesting opportunity, and we want to structure it correctly. Noe's sponsored partnerships generally begin with a three-content campaign — typically a product introduction, a demonstration or use-case piece, and a results/comparison post — which gives the brand enough repetition to introduce, demonstrate, and reinforce the message with his audience. The base investment for organic creation and posting starts at $3,000, with paid usage, licensing, whitelisting, exclusivity, and additional platforms quoted separately on top. Because your request appears to involve extended usage rights (such as paid media, whitelisting, licensing, or name/likeness/AI rights), those are handled as separate line items and, in some cases, require additional legal and commercial review before we can quote. Could you confirm the exact usage scope, term, territory, and whether any perpetual, exclusivity, or likeness/AI rights are involved? Nothing is agreed until those terms are defined in writing."
+    },
+    "affiliate": {
+      "label": "Affiliate / revenue-share counter",
+      "subject": "Re: Partnership with Noe Varner — {brand}",
+      "body": "Hi {name} — Aaron here. I manage Noe Varner's brand partnerships. Thanks for reaching out. Noe is selective about affiliate-only arrangements; we're open to a partnership that pairs a guaranteed base fee with commission on top. Could you share the product, commission rate, and attribution/cookie window? If Noe would also be posting on his own channels, note that his organic sponsored partnerships start at a $3,000 base package (three-content), with affiliate commission layered on top of that."
+    },
+    "ugc": {
+      "label": "UGC-only production (separate production + licensing)",
+      "subject": "Re: Partnership with Noe Varner — {brand}",
+      "body": "Hi {name} — Aaron here. I manage Noe Varner's brand partnerships. Happy to explore a UGC production for you. For content Noe produces but does not publish on his own channels, we quote a production fee separately from any usage rights. Could you confirm the deliverable specs, and the intended usage — platforms, duration, territory, editing rights, and whether you need paid-media/whitelisting? The production fee covers creation only; licensing and paid usage are priced on top based on scope. This keeps Noe's likeness and identity rights protected and clearly defined."
+    },
+    "retainer": {
+      "label": "Retainer / ambassador (recurring)",
+      "subject": "Re: Partnership with Noe Varner — {brand}",
+      "body": "Hi {name} — Aaron here. I manage Noe Varner's brand partnerships. Appreciate you thinking of Noe for an ongoing partnership. To scope a retainer, could you share the monthly deliverables, whether the work posts on Noe's own channels or requires separate/anonymous accounts or UGC production, the expected duration, and your monthly budget? We'll structure a monthly rate and confirm scope before committing — we evaluate recurring offers on their confirmed monthly value, not on assumed annual totals."
+    },
+    "decline": {
+      "label": "Polite decline (relationship-preserving)",
+      "subject": "Re: {brand} x Noe Varner",
+      "body": "Hi {name} — Aaron here, I manage Noe Varner's brand partnerships. Thank you for thinking of Noe for this. After a look, it isn't quite the right fit for his audience and content focus right now, so we'll pass on this occasion. We genuinely appreciate the outreach and would be glad to stay in touch if something more aligned comes up in the future. Wishing you a successful campaign."
+    },
+    "event": {
+      "label": "Event / interview / consulting / advisory",
+      "subject": "Re: Partnership with Noe Varner — {brand}",
+      "body": "Hi {name} — Aaron here. I manage Noe Varner's brand partnerships. Thanks for the invitation. For events, interviews, webinars, or advisory work, we quote based on format, prep, time commitment, and any travel. Could you share the date, format, audience, time required, and whether any content rights or recordings are involved? I'll come back with a fee tailored to the engagement."
+    },
+    "licensing": {
+      "label": "Paid-ad creative / licensing (separate fees)",
+      "subject": "Re: Partnership with Noe Varner — {brand}",
+      "body": "Hi {name} — Aaron here. I manage Noe Varner's brand partnerships. Thanks for the outreach. For ad creative or licensed content, we separate the production fee from the media-usage/licensing fee. Could you share the intended platforms, campaign duration, territory, and whether this includes whitelisting, Spark Ads, or paid-media amplification? I'll quote a production fee plus a licensing fee scoped to your usage. Nothing is agreed until the usage terms are confirmed."
+    }
+  },
+  "drafts": [
+    { "id": "NV-REPLY-0001", "dealId": "NV-DEAL-0001", "template": "posted", "name": "Jennifer" },
+    { "id": "NV-REPLY-0002", "dealId": "NV-DEAL-0002", "template": "exception", "name": "Eva" },
+    { "id": "NV-REPLY-0003", "dealId": "NV-DEAL-0003", "template": "affiliate", "name": "Sunny" },
+    { "id": "NV-REPLY-0004", "dealId": "NV-DEAL-0004", "template": "posted", "name": "Amy" },
+    { "id": "NV-REPLY-0005", "dealId": "NV-DEAL-0005", "template": "ugc", "name": "Lily" },
+    { "id": "NV-REPLY-0006", "dealId": "NV-DEAL-0006", "template": "posted", "name": "Kico" },
+    { "id": "NV-REPLY-0007", "dealId": "NV-DEAL-0007", "template": "retainer", "name": "there" },
+    { "id": "NV-REPLY-0008", "dealId": "NV-DEAL-0008", "template": "affiliate", "name": "Theo" },
+    { "id": "NV-REPLY-0009", "dealId": "NV-DEAL-0009", "template": "posted", "name": "Sam" },
+    { "id": "NV-REPLY-0010", "dealId": "NV-DEAL-0010", "template": "posted", "name": "Cheryl" },
+    { "id": "NV-REPLY-0011", "dealId": "NV-DEAL-0011", "template": "decline", "name": "Wendell" },
+    { "id": "NV-REPLY-0012", "dealId": "NV-DEAL-0012", "template": "event", "name": "Sid" },
+    { "id": "NV-REPLY-0013", "dealId": "NV-DEAL-0013", "template": "posted", "name": "Robert" },
+    { "id": "NV-REPLY-0014", "dealId": "NV-DEAL-0014", "template": "posted", "name": "there" },
+    { "id": "NV-REPLY-0015", "dealId": "NV-DEAL-0015", "template": "posted", "name": "Olga" },
+    { "id": "NV-REPLY-0016", "dealId": "NV-DEAL-0016", "template": "ugc", "name": "Suri" },
+    { "id": "NV-REPLY-0017", "dealId": "NV-DEAL-0017", "template": "posted", "name": "Ira" },
+    { "id": "NV-REPLY-0018", "dealId": "NV-DEAL-0018", "template": "ugc", "name": "Kelsi" },
+    { "id": "NV-REPLY-0019", "dealId": "NV-DEAL-0019", "template": "retainer", "name": "Felipe" },
+    { "id": "NV-REPLY-0020", "dealId": "NV-DEAL-0020", "template": "posted", "name": "Callie" },
+    { "id": "NV-REPLY-0021", "dealId": "NV-DEAL-0021", "template": "decline", "name": "Sandra" },
+    { "id": "NV-REPLY-0022", "dealId": "NV-DEAL-0022", "template": "affiliate", "name": "Miriam" },
+    { "id": "NV-REPLY-0023", "dealId": "NV-DEAL-0023", "template": "posted", "name": "Marcus" },
+    { "id": "NV-REPLY-0024", "dealId": "NV-DEAL-0024", "template": "affiliate", "name": "Founder" },
+    { "id": "NV-REPLY-0025", "dealId": "NV-DEAL-0025", "template": "exception", "name": "Annie" },
+    { "id": "NV-REPLY-0026", "dealId": "NV-DEAL-0026", "template": "decline", "name": "there" },
+    { "id": "NV-REPLY-0027", "dealId": "NV-DEAL-0027", "template": "posted", "name": "Nancy" },
+    { "id": "NV-REPLY-0028", "dealId": "NV-DEAL-0028", "template": "exception", "name": "Keke" },
+    { "id": "NV-REPLY-0030", "dealId": "NV-DEAL-0030", "template": "decline", "name": "there" },
+    { "id": "NV-REPLY-0031", "dealId": "NV-DEAL-0031", "template": "decline", "name": "Claudio" },
+    { "id": "NV-REPLY-0032", "dealId": "NV-DEAL-0032", "template": "posted", "name": "there" },
+    { "id": "NV-REPLY-0033", "dealId": "NV-DEAL-0033", "template": "affiliate", "name": "there" },
+    { "id": "NV-REPLY-0035", "dealId": "NV-DEAL-0035", "template": "posted", "name": "Vinod" },
+    { "id": "NV-REPLY-0036", "dealId": "NV-DEAL-0036", "template": "posted", "name": "Clara" },
+    { "id": "NV-REPLY-0037", "dealId": "NV-DEAL-0037", "template": "posted", "name": "Rixin" },
+    { "id": "NV-REPLY-0038", "dealId": "NV-DEAL-0038", "template": "posted", "name": "Maggie" },
+    { "id": "NV-REPLY-0039", "dealId": "NV-DEAL-0039", "template": "posted", "name": "Kaya" },
+    { "id": "NV-REPLY-0040", "dealId": "NV-DEAL-0040", "template": "posted", "name": "Jordan" },
+    { "id": "NV-REPLY-0041", "dealId": "NV-DEAL-0041", "template": "exception", "name": "Maryam" },
+    { "id": "NV-REPLY-0042", "dealId": "NV-DEAL-0042", "template": "posted", "name": "Dora" },
+    { "id": "NV-REPLY-0043", "dealId": "NV-DEAL-0043", "template": "exception", "name": "Vicky" },
+    { "id": "NV-REPLY-0044", "dealId": "NV-DEAL-0044", "template": "posted", "name": "Amy" },
+    { "id": "NV-REPLY-0045", "dealId": "NV-DEAL-0045", "template": "posted", "name": "Yvonne" },
+    { "id": "NV-REPLY-0046", "dealId": "NV-DEAL-0046", "template": "posted", "name": "Bella" },
+    { "id": "NV-REPLY-0047", "dealId": "NV-DEAL-0047", "template": "retainer", "name": "Kavy" },
+    { "id": "NV-REPLY-0048", "dealId": "NV-DEAL-0048", "template": "affiliate", "name": "Andika" },
+    { "id": "NV-REPLY-0050", "dealId": "NV-DEAL-0050", "template": "posted", "name": "Iris" },
+    { "id": "NV-REPLY-0051", "dealId": "NV-DEAL-0051", "template": "retainer", "name": "Claire" },
+    { "id": "NV-REPLY-0052", "dealId": "NV-DEAL-0052", "template": "posted", "name": "Ariel" },
+    { "id": "NV-REPLY-0053", "dealId": "NV-DEAL-0053", "template": "posted", "name": "Sophie" },
+    { "id": "NV-REPLY-0054", "dealId": "NV-DEAL-0054", "template": "posted", "name": "Luna" },
+    { "id": "NV-REPLY-0055", "dealId": "NV-DEAL-0055", "template": "posted", "name": "Chris" },
+    { "id": "NV-REPLY-0056", "dealId": "NV-DEAL-0056", "template": "posted", "name": "Siyo.li" },
+    { "id": "NV-REPLY-0057", "dealId": "NV-DEAL-0057", "template": "licensing", "name": "Angelina" },
+    { "id": "NV-REPLY-0058", "dealId": "NV-DEAL-0058", "template": "posted", "name": "Carey" },
+    { "id": "NV-REPLY-0059", "dealId": "NV-DEAL-0059", "template": "posted", "name": "Emily" },
+    { "id": "NV-REPLY-0060", "dealId": "NV-DEAL-0060", "template": "posted", "name": "Himanshu" },
+    { "id": "NV-REPLY-0061", "dealId": "NV-DEAL-0061", "template": "posted", "name": "Philip" },
+    { "id": "NV-REPLY-0062", "dealId": "NV-DEAL-0062", "template": "licensing", "name": "Jon" },
+    { "id": "NV-REPLY-0063", "dealId": "NV-DEAL-0063", "template": "posted", "name": "Emily" },
+    { "id": "NV-REPLY-0064", "dealId": "NV-DEAL-0064", "template": "exception", "name": "Tina" },
+    { "id": "NV-REPLY-0065", "dealId": "NV-DEAL-0065", "template": "posted", "name": "Sylvia" }
+  ]
+}

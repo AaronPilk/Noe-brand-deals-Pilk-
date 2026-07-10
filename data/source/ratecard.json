@@ -1,0 +1,48 @@
+{
+  "note": "Rate Card & Valuation tab. Basis: 104K IG followers, median ~13-14K Reel views, AI-marketing/B2B niche (high-value audience). All figures editable estimates in USD.",
+  "deliverables": [
+    { "format": "Instagram Reel (dedicated)", "low": 900, "base": 1400, "premium": 2200, "notes": "Primary format; niche B2B AI premium over raw CPM" },
+    { "format": "Instagram Story package (3-5 frames)", "low": 350, "base": 550, "premium": 850, "notes": "Add-on or standalone awareness" },
+    { "format": "Carousel or static post", "low": 500, "base": 800, "premium": 1200, "notes": "Lower reach than Reel, evergreen" },
+    { "format": "TikTok repost / cross-post", "low": 300, "base": 500, "premium": 800, "notes": "Repurposed asset, secondary platform" },
+    { "format": "YouTube Short", "low": 400, "base": 650, "premium": 1000, "notes": "Depends on YT channel size (secondary)" },
+    { "format": "YouTube integration (60-90s in a video)", "low": 800, "base": 1300, "premium": 2000, "notes": "Integrated segment in longer video" },
+    { "format": "Dedicated YouTube video", "low": 1500, "base": 2600, "premium": 4500, "notes": "Full dedicated review/tutorial" },
+    { "format": "UGC-only video (no posting on Noe channels)", "low": 600, "base": 950, "premium": 1500, "notes": "Content-production only; brand posts it" },
+    { "format": "Unlisted ad creative (paid-media only)", "low": 800, "base": 1300, "premium": 2200, "notes": "Made for brand ad account, not organic" },
+    { "format": "Cross-platform package (Reel+Story+TikTok)", "low": 1600, "base": 2600, "premium": 4200, "notes": "Bundled discount vs sum of parts" },
+    { "format": "Webinar / livestream appearance", "low": 1000, "base": 1800, "premium": 3000, "notes": "Live time + prep" },
+    { "format": "Consulting / advisory appearance (hourly/session)", "low": 300, "base": 500, "premium": 900, "notes": "Per hour or short session" },
+    { "format": "Monthly ambassador package", "low": 3500, "base": 6000, "premium": 10000, "notes": "Recurring content + light rights; per month" }
+  ],
+  "rights": [
+    { "format": "30-day paid usage (per format)", "low": 250, "base": 400, "premium": 600, "notes": "% or flat; short flight" },
+    { "format": "60-day paid usage", "low": 400, "base": 650, "premium": 950, "notes": "" },
+    { "format": "90-day paid usage", "low": 550, "base": 900, "premium": 1400, "notes": "" },
+    { "format": "180-day paid usage", "low": 900, "base": 1500, "premium": 2400, "notes": "" },
+    { "format": "365-day paid usage", "low": 1500, "base": 2600, "premium": 4200, "notes": "Full year ad license" },
+    { "format": "Whitelisting / Partnership (Spark) Ads", "low": 600, "base": 1100, "premium": 2000, "notes": "Run ads from Noe handle; +per 30 days" },
+    { "format": "Organic brand reposting (brand handle)", "low": 150, "base": 300, "premium": 500, "notes": "Low incremental" },
+    { "format": "Raw footage / project files", "low": 400, "base": 700, "premium": 1200, "notes": "Hand over source assets" },
+    { "format": "Additional revisions (per round beyond 2)", "low": 150, "base": 250, "premium": 400, "notes": "" },
+    { "format": "Rush delivery (<5 business days)", "low": 200, "base": 400, "premium": 700, "notes": "+25-40% of base" },
+    { "format": "Exclusivity (category, per 30 days)", "low": 500, "base": 1000, "premium": 2000, "notes": "Cannot work with competitors" },
+    { "format": "Work-for-hire / buyout (full ownership)", "low": 1500, "base": 3000, "premium": 6000, "notes": "Transfer of copyright" },
+    { "format": "Perpetual usage premium", "low": 2500, "base": 5000, "premium": 10000, "notes": "Indefinite license; heavily discouraged" },
+    { "format": "Global vs limited territory uplift", "low": 300, "base": 600, "premium": 1200, "notes": "Worldwide rights premium" }
+  ],
+  "aiIdentityRights": "CRITICAL: AI training / voice / likeness / avatar / synthetic-media rights are never bundled into a sponsorship fee. Requires separate legal + commercial negotiation. Baseline floor 3-10x the content fee and typically declined absent extraordinary terms.",
+  "scoring": {
+    "components": [
+      { "name": "Brand Fit + Audience Fit (averaged)", "points": 20 },
+      { "name": "Revenue Potential", "points": 20 },
+      { "name": "Brand Credibility", "points": 15 },
+      { "name": "Strategic Value", "points": 15 },
+      { "name": "Offer Fairness", "points": 10 },
+      { "name": "Workload Efficiency", "points": 10 },
+      { "name": "Recency", "points": 5 },
+      { "name": "Long-Term Potential", "points": 5 }
+    ],
+    "note": "Positive subtotal max 100; Risk Penalty applied after. Total = Positive Subtotal + Risk Penalty."
+  }
+}

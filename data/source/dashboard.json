@@ -1,0 +1,59 @@
+{
+  "note": "Executive Dashboard tab, v3.0-PRICING revaluation. Figures are separated by confidence type and must NEVER be summed into one headline number.",
+  "syncedAt": "2026-07-10 22:14 GMT",
+  "recordVersion": "v3.0-PRICING",
+  "sourceSheet": "https://docs.google.com/spreadsheets/d/1IWZvpytW8Rhn9rzcJaDcYMmlSw-ZgE1gCPFWBjAqEM4/edit",
+  "money": [
+    { "key": "confirmed_one_time_cash", "label": "Confirmed one-time cash", "amount": 650, "type": "CONFIRMED", "notes": "One-off stated cash: Serus $250 + Ryze $400. Ssemble excluded (monthly rate)." },
+    { "key": "confirmed_guaranteed", "label": "Confirmed guaranteed cash", "amount": 650, "type": "CONFIRMED", "notes": "No guaranteed multi-month contracts stated; equals explicit one-off cash." },
+    { "key": "monthly_recurring", "label": "Monthly recurring offers (per month)", "amount": 2000, "type": "CONFIRMED (monthly rate)", "notes": "Ssemble $2,000/mo. Guaranteed duration UNKNOWN. NOT a guaranteed total." },
+    { "key": "annualized_recurring", "label": "Potential annualized recurring value", "amount": 24000, "type": "ESTIMATE (speculative)", "notes": "$2,000/mo x 12 IF renewed. NOT confirmed revenue." },
+    { "key": "noncash", "label": "Noncash product / credit value", "amount": 620, "type": "NONCASH", "notes": "Gifted products/credits. Not cash." },
+    { "key": "conservative_market", "label": "Conservative market value (viable deals)", "amount": 143600, "type": "ESTIMATE", "notes": "Low estimate. v3.0 pricing floor applied (was $63,875)." },
+    { "key": "base_market", "label": "Base market value (viable deals)", "amount": 228650, "type": "ESTIMATE", "notes": "Fair market value if all viable deals closed at market (was $91,250)." },
+    { "key": "high_market", "label": "High-upside market value", "amount": 386400, "type": "ESTIMATE", "notes": "Optimistic upper bound (was $138,945)." },
+    { "key": "likely_pipeline", "label": "Likely negotiated pipeline", "amount": 186400, "type": "ESTIMATE", "notes": "Realistic negotiated close, pre-probability (was $76,529)." },
+    { "key": "prob_weighted", "label": "Probability-weighted pipeline", "amount": 42875, "type": "PRIMARY", "notes": "Likely close x close probability. PRIMARY realistic number (was $25,117)." },
+    { "key": "recoverable_stale", "label": "Recoverable stale pipeline", "amount": 6568, "type": "ESTIMATE", "notes": "Value in expired/stale deals if re-opened." },
+    { "key": "annual_relationship", "label": "Potential annual relationship value", "amount": 30000, "type": "ESTIMATE (speculative)", "notes": "Ambassador/retainer relationships annualized (rough 3x base)." },
+    { "key": "hidden_rights", "label": "Hidden licensing & rights value", "amount": 65000, "type": "ESTIMATE", "notes": "Paid-usage/whitelisting/licensing rights requested but usually unpriced (was $20,700)." },
+    { "key": "affiliate_upside", "label": "Speculative affiliate upside", "amount": 0, "type": "SPECULATIVE (uncounted)", "notes": "Multiple affiliate/rev-share deals; no guaranteed base. Not counted as cash." }
+  ],
+  "pipelineSummary": {
+    "totalDeals": 65,
+    "gradeDistribution": { "B": 5, "C": 29, "D": 23, "Reject/Archive": 8 },
+    "dealsWithExplicitCash": 2,
+    "legalReviewDeals": 4,
+    "scamsHigh": 1,
+    "suspiciousMedium": 2
+  },
+  "structureCounts": {
+    "Posted sponsorship": 35,
+    "UGC-only": 3,
+    "Paid-ad/Licensing": 2,
+    "Retainer/Ambassador": 4,
+    "Event/Advisory": 1,
+    "Affiliate/Rev-share": 6,
+    "Strategic exception": 6,
+    "Decline/Archive": 5,
+    "Do-not-engage": 3
+  },
+  "draftCounts": { "total": 62, "posted": 35, "exception": 6, "declines": 5, "noDraft": 3 },
+  "pricingPolicy": {
+    "minPerPost": 1000,
+    "minPosts": 3,
+    "minPackage": 3000,
+    "statement": "Organic posting floor: $1,000/post minimum, 3-post minimum campaign, $3,000 minimum organic package. Paid usage, licensing, whitelisting, exclusivity and additional rights are priced separately and never bundled into the base fee. AI training / voice / likeness / synthetic-media rights are never bundled into a sponsorship fee — separate legal + commercial negotiation, baseline 3-10x content fee, typically declined."
+  },
+  "bestLongTerm": ["NV-DEAL-0019", "NV-DEAL-0047"],
+  "igEvidence": {
+    "handle": "@noevarner.ai",
+    "reviewed": "2026-07-10",
+    "followers": 104000,
+    "posts": 690,
+    "medianViews": 12400,
+    "avgViews": 46693,
+    "coreMedianViews": 10600,
+    "confidence": "MODERATE — public observations only; private Insights unavailable"
+  }
+}
