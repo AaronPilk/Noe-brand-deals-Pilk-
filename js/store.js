@@ -24,6 +24,10 @@ const NVStore = (() => {
       const raw = localStorage.getItem(KEY);
       if (raw) return JSON.parse(raw);
     } catch (e) { /* corrupted or unavailable */ }
+    // Seed from the repo-committed baseline (data/nv-ops.js) if present.
+    if (window.NV_OPS && typeof window.NV_OPS.deals === 'object') {
+      try { return JSON.parse(JSON.stringify(window.NV_OPS)); } catch (e) { /* fall through */ }
+    }
     return { deals: {}, voiceProfile: { ...DEFAULT_VOICE_PROFILE }, voiceLibrary: [], theme: null, sidebar: false, createdAt: new Date().toISOString() };
   }
   function save() {

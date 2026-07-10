@@ -544,6 +544,11 @@ function viewDealDetail(id, params) {
           <div class="ins-row"><span class="k">Owner</span><span class="v">Aaron</span></div>
         </div>
         <div class="card" style="margin-top:12px">
+          <h3>Work with Claude</h3>
+          <button class="btn primary" id="copy-context" style="width:100%;justify-content:center">Copy briefing for Claude</button>
+          <div style="font-size:11.5px;color:var(--text-3);margin-top:8px">Full deal context — position, rules, your voice, the draft, notes — packaged for one paste into Claude. Add the brand's latest message at the bottom and ask for the counter.</div>
+        </div>
+        <div class="card" style="margin-top:12px">
           <h3>Stage</h3>
           <select id="stage-select">${STAGES.map((s) => `<option ${s === stage ? 'selected' : ''}>${s}</option>`).join('')}</select>
           <div style="font-size:11.5px;color:var(--text-3);margin-top:7px">Changes are logged with before/after — the audit record underneath is never overwritten.</div>
@@ -568,6 +573,9 @@ function viewDealDetail(id, params) {
         const ta = document.getElementById('note-input');
         if (ta.value.trim()) { NVStore.addNote(id, ta.value.trim()); toast('Note added'); renderRoute(); }
       });
+      document.getElementById('copy-context')?.addEventListener('click', () => {
+        copyText(buildClaudeContext(id), 'Briefing copied — paste to Claude with the brand\'s reply');
+      });
       document.getElementById('log-reply')?.addEventListener('click', () => {
         const ta = document.getElementById('brand-reply');
         if (ta.value.trim()) {
@@ -581,6 +589,70 @@ function viewDealDetail(id, params) {
       bindDraftActions(id);
     }
   };
+}
+
+/* Full negotiation briefing for Claude — one paste gives complete deal context */
+function buildClaudeContext(id) {
+  const d = dealById(id);
+  const draft = draftByDeal(id);
+  const res = researchByDeal(id);
+  const vp = NVStore.getVoiceProfile();
+  const notes = NVStore.getNotes(id);
+  const activity = NVStore.getActivity(id).slice(0, 12);
+  const lib = NVStore.getVoiceLibrary().map((v) => draftById(v.draftId)).filter(Boolean);
+  return `# Negotiation briefing — ${d.brand} (${d.deal_id})
+
+You are drafting as Aaron, manager of Noe Varner's brand partnerships. Recommend strategy and write the reply, but never send, accept terms, or concede rights — Aaron approves everything.
+
+## Deal
+- Product: ${d.product} (${d.ai_category})
+- Agency: ${d.agency || 'none — direct'}
+- Contact: ${d.contact_email}
+- Type/structure: ${d.deal_type} / ${d.commercial_structure}
+- Audit: ${d.total_score}/100, grade ${d.grade}, ${d.priority} priority, stage ${dealStage(d)}
+- Last contact: ${d.days_since_contact} days ago
+- Red flags: ${d.red_flags || 'none noted'}
+- Rights signals: ${d.rights_flags}
+- Scam risk: ${d.scam_risk} · Legal review: ${d.legal_review}
+
+## Position (USD)
+- Brand's stated offer: ${d.explicit_cash_usd > 0 ? d.explicit_cash_usd : 'none disclosed'}
+- Recommended opening ask: ${d.total_recommended_opening_ask} (organic ${d.organic_posting_fee} / production ${d.production_fee} / licensing ${d.licensing_fee} / paid usage ${d.paid_usage_fee} / exclusivity ${d.exclusivity_fee})
+- Target close: ${d.likely_close_usd} · Floor (never below): ${d.minimum_acceptable_close}
+- Fair market: ${d.market_value_base_usd} · Unpriced rights value: ${d.hidden_rights_usd}
+- Close probability: ${d.close_probability} → weighted ${d.prob_weighted_usd}
+- Strategic exception required: ${d.strategic_exception_required}
+- Open questions: ${d.key_questions}
+- Recommended action: ${d.recommended_action}
+
+## Brand research
+${res ? `${res.company}\nDomain: ${res.domain} (${res.domainLegitimacy})\nReputation: ${res.reputation} · Fit: ${res.fit}\nNote: ${res.notes}` : `Baseline only — domain ${d.contact_email.split('@')[1]}, scam risk ${d.scam_risk}.`}
+
+## Hard rules
+- $1,000/post minimum, 3-post minimum, $3,000 minimum organic package.
+- Paid usage, licensing, whitelisting, exclusivity: separate line items, never bundled.
+- No perpetual usage under a standard fee. AI likeness/voice/training rights: separate legal + commercial negotiation, 3–10x baseline, usually declined.
+- Anything below the floor must be labeled EXCEPTION REQUIRES AARON APPROVAL.
+- Do not reveal internal minimums, fabricate performance, or claim competing offers.
+
+## Aaron's voice
+${vp.traits}
+Style: ${vp.sentences}
+Greeting: ${vp.greeting} · Sign-off: ${vp.signoff.replace(/\n/g, ' / ')}
+Never use: ${vp.banned}
+${lib.length ? `\n## Approved voice examples (match these over everything else)\n${lib.slice(0, 2).map((x) => `---\nSubject: ${x.subject}\n${x.body}`).join('\n')}` : ''}
+
+## Current prepared draft (${draft ? draft.id + ' — on hold' : 'none'})
+${draft ? `Subject: ${draft.subject}\n${draft.body}` : '(no draft — ' + d.commercial_structure + ')'}
+
+${notes.length ? `## Aaron's notes\n${notes.map((n) => '- ' + n.text).join('\n')}` : ''}
+${activity.length ? `## Recent activity\n${activity.map((a) => `- [${a.source}] ${a.title}${a.detail ? ': ' + a.detail : ''}`).join('\n')}` : ''}
+
+## Task
+Analyze the brand's latest message (pasted below), tell Aaron: what they're asking, what changed, what it's worth, the exact counter and why, what not to concede, what to trade, push/hold/accept/clarify/walk, close likelihood, main risk. Then write the reply in Aaron's voice with subject line, recommended counter amount, protected terms, and internal notes.
+
+BRAND'S LATEST MESSAGE:
+[paste here]`;
 }
 
 /* draft renderer + approval-gated actions (no send button by design) */
