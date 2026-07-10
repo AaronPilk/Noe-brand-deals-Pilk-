@@ -307,8 +307,7 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
 /* ---------- Command menu ---------- */
 .cmdk-overlay {
   position: fixed; inset: 0; z-index: 100;
-  background: rgba(0,0,0,.32);
-  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  background: rgba(0,0,0,.22);
   display: flex; justify-content: center; align-items: flex-start; padding-top: 12vh;
   animation: fade .16s var(--ease);
 }
