@@ -118,7 +118,40 @@ function viewHome() {
       </div>
     </div>
 
-    <div class="section-title">Money on the table <span class="hint">separated by confidence — never summed</span></div>
+    ${(() => {
+      const A = NV.active?.deals || [];
+      if (!A.length) return '';
+      const live = A.filter((a) => a.stage !== 'DEAD');
+      const collected = A.reduce((s, a) => s + (a.received || 0), 0);
+      const outstanding = live.reduce((s, a) => s + Math.max(0, (a.amount || 0) - (a.received || 0)), 0);
+      const approval = live.filter((a) => a.stage === 'Needs Approval');
+      return `
+    <div class="section-title">Live deals <span class="hint">from Airtable — real signed work, real cash</span></div>
+    <div class="grid cols-4">
+      <div class="card kpi" style="cursor:pointer" onclick="location.hash='#/active'">
+        <div class="kpi-label">Cash collected <span class="chip green">CONFIRMED</span></div>
+        <div class="kpi-value">${fmt$(collected)}</div>
+        <div class="kpi-note">Payments actually received.</div>
+      </div>
+      <div class="card kpi" style="cursor:pointer" onclick="location.hash='#/active'">
+        <div class="kpi-label">Outstanding <span class="chip green">CONFIRMED</span></div>
+        <div class="kpi-value">${fmt$(outstanding)}</div>
+        <div class="kpi-note">Contracted balance to collect on live deals.</div>
+      </div>
+      <div class="card kpi" style="cursor:pointer" onclick="location.hash='#/active'">
+        <div class="kpi-label">In production</div>
+        <div class="kpi-value">${live.length}</div>
+        <div class="kpi-note">${live.reduce((s, a) => s + (a.assets.totalRemaining || 0), 0)} assets still owed across live deals.</div>
+      </div>
+      <div class="card kpi" style="cursor:pointer" onclick="location.hash='#/active'">
+        <div class="kpi-label">Awaiting approval</div>
+        <div class="kpi-value">${approval.length}</div>
+        <div class="kpi-note">${approval.map((a) => esc(a.brand)).join(' · ') || '—'}</div>
+      </div>
+    </div>`;
+    })()}
+
+    <div class="section-title">Money on the table <span class="hint">audited inbound offers — separated by confidence, never summed</span></div>
     <div class="grid cols-3">
       ${moneyCard(m.confirmed_one_time_cash, 'green')}
       ${moneyCard(m.monthly_recurring, 'green')}
@@ -306,6 +339,9 @@ function viewDealDetail(id, params) {
   ].filter(([, v]) => v > 0);
 
   const banners = [];
+  const twins = activeByBrand(d.brand);
+  if (twins.length)
+    banners.push(`<div class="banner blue"><span>◎</span><div><b>Also in Active Deals:</b> ${twins.map((a) => `${esc(a.brand)} Round ${a.round} — ${esc(a.stage)}${a.amount ? ' · ' + fmt$(a.amount) : ''}`).join(' · ')}. <a href="#/active">Open Active Deals</a> for delivery/payment state before negotiating here.</div></div>`);
   if (d.scam_risk === 'High' || d.commercial_structure === 'Do-not-engage')
     banners.push(`<div class="banner red"><span>✕</span><div><b>Do not engage.</b> ${esc(d.red_flags || 'Flagged as suspicious during the audit.')}</div></div>`);
   else if (d.scam_risk === 'Medium')
@@ -731,6 +767,70 @@ function viewNegotiations() {
   };
 }
 
+/* ---------------- ACTIVE DEALS (Airtable — execution stage) ---------------- */
+const STAGE_COLOR = { 'Lead': 'amber', 'Negotiating': 'amber', 'Payment Received': 'green', 'Creating': 'blue', 'Needs Approval': 'purple', 'Approved': 'green', 'Posted': 'blue', 'Payment 2 Collected': 'green', 'Follow Up': 'amber', 'DEAD': 'red' };
+const stageChip = (s) => `<span class="chip ${STAGE_COLOR[s] || ''}">${esc(s)}</span>`;
+const activeByBrand = (brand) => (NV.active?.deals || []).filter((a) => brand.toLowerCase().includes(a.brand.toLowerCase().split(' ')[0]) || a.brand.toLowerCase().includes(brand.toLowerCase().split(' ')[0]));
+
+function viewActive() {
+  const A = NV.active.deals;
+  const live = A.filter((a) => a.stage !== 'DEAD');
+  const collected = A.reduce((s, a) => s + (a.received || 0), 0);
+  const outstanding = live.reduce((s, a) => s + Math.max(0, (a.amount || 0) - (a.received || 0)), 0);
+  const assetsRemaining = live.reduce((s, a) => s + (a.assets.totalRemaining || 0), 0);
+  const linkify = (t) => esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener" onclick="event.stopPropagation()">$1</a>');
+
+  const row = (a, i) => {
+    const out = a.amount != null ? Math.max(0, a.amount - (a.received || 0)) : null;
+    const prog = a.assets.totalRequired ? `${a.assets.totalRequired - a.assets.totalRemaining}/${a.assets.totalRequired}` : '—';
+    return `
+    <tr data-exp="${i}" style="cursor:pointer">
+      <td><b>${esc(a.brand)}</b>${a.round > 1 ? ` <span class="chip blue">Round ${a.round}</span>` : ''}<br><span style="color:var(--text-3);font-size:11.5px">${esc(a.source)}</span></td>
+      <td>${stageChip(a.stage)}</td>
+      <td class="money">${a.amount != null ? fmt$(a.amount) : '<span class="chip amber">Unconfirmed</span>'}</td>
+      <td class="money" style="color:var(--green)">${a.received ? fmt$(a.received) : '—'}</td>
+      <td class="money">${out ? `<b style="color:var(--amber)">${fmt$(out)}</b>` : out === 0 ? '<span class="chip green">Paid in full</span>' : '—'}</td>
+      <td class="num">${prog}</td>
+      <td class="num" style="font-size:12px">${a.affiliatePct ? Math.round(a.affiliatePct * 100) + '%' : '—'}</td>
+      <td style="font-size:12px;color:var(--text-3)">${a.nextPaymentDue || '—'}</td>
+    </tr>
+    <tr class="exp-row" id="exp-${i}" hidden><td colspan="8" style="background:var(--surface-2)">
+      <div class="kv-grid" style="padding:6px 2px">
+        ${a.deliverables ? `<div class="k">Deliverables</div><div class="v" style="white-space:pre-wrap">${linkify(a.deliverables)}</div>` : ''}
+        ${a.notes ? `<div class="k">Notes</div><div class="v" style="white-space:pre-wrap">${linkify(a.notes)}</div>` : ''}
+        ${a.postedUrls ? `<div class="k">Posted</div><div class="v" style="white-space:pre-wrap">${linkify(a.postedUrls)}</div>` : ''}
+        ${a.affiliateLink ? `<div class="k">Affiliate link</div><div class="v">${linkify(a.affiliateLink)}</div>` : ''}
+        <div class="k">Airtable</div><div class="v"><span class="chip">Imported from Airtable · ${esc(a.id)}</span></div>
+      </div>
+    </td></tr>`;
+  };
+
+  return {
+    title: 'Active Deals',
+    html: `
+      <h1 class="page-title">Active Deals</h1>
+      <div class="page-sub">Execution-stage deals from Airtable (Content System → Brand Deals) — the ones actually running, separate from the ${NV.deals.length} audited inbound offers. Synced ${esc(NV.active.syncedAt)}; new DM deals appear on next sync.</div>
+      <div class="grid cols-4">
+        <div class="card kpi"><div class="kpi-label">Cash collected <span class="chip green">CONFIRMED</span></div><div class="kpi-value">${fmt$(collected)}</div><div class="kpi-note">Actual payments received across all rounds.</div></div>
+        <div class="card kpi"><div class="kpi-label">Outstanding on live deals <span class="chip green">CONFIRMED</span></div><div class="kpi-value">${fmt$(outstanding)}</div><div class="kpi-note">Contracted balance still to collect (excludes DEAD).</div></div>
+        <div class="card kpi"><div class="kpi-label">Live deals</div><div class="kpi-value">${live.length}</div><div class="kpi-note">${live.filter((a) => a.stage === 'Needs Approval').length} awaiting approval · ${live.filter((a) => a.stage === 'Creating').length} in production.</div></div>
+        <div class="card kpi"><div class="kpi-label">Assets still owed</div><div class="kpi-value">${assetsRemaining}</div><div class="kpi-note">Videos remaining across live deals.</div></div>
+      </div>
+      <div class="section-title">All rounds <span class="hint">click a row for the brief, notes, and posted links</span></div>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>Deal</th><th>Stage</th><th class="money">Deal amount</th><th class="money">Received</th><th class="money">Outstanding</th><th>Assets</th><th>Affil.</th><th>Next payment</th></tr></thead>
+        <tbody>${[...A].sort((a, b) => (a.stage === 'DEAD') - (b.stage === 'DEAD') || (b.amount || 0) - (a.amount || 0)).map(row).join('')}</tbody>
+      </table></div>
+      <div class="banner blue" style="margin-top:14px"><span>ℹ</span><div><b>Two systems, one view.</b> These records live in Airtable (delivery + payment tracking). The 65 audited inbound offers live in the Google Sheet (negotiation). When an inbound offer closes, it graduates here. Higgsfield appears in both — the audit has a fresh retainer approach (NV-DEAL-0047) while the old direct deal sits DEAD with filmed footage available.</div></div>`,
+    mount() {
+      document.querySelectorAll('[data-exp]').forEach((tr) => tr.addEventListener('click', () => {
+        const exp = document.getElementById('exp-' + tr.dataset.exp);
+        if (exp) exp.hidden = !exp.hidden;
+      }));
+    }
+  };
+}
+
 /* ---------------- FOLLOW-UPS ---------------- */
 function viewFollowups() {
   const groups = [
@@ -947,7 +1047,15 @@ function viewHealth() {
         <div class="card kpi"><div class="kpi-label">Your changes logged</div><div class="kpi-value">${opsCount}</div><div class="kpi-note">Operational events in this browser's activity history.</div></div>
       </div>
       <div class="card" style="margin-top:16px">
-        <h3>Source</h3>
+        <h3>Source 2 — Airtable (live deals)</h3>
+        <div class="kv-grid">
+          <div class="k">Table</div><div class="v">Content System → Brand Deals (${NV.active.deals.length} records, ${NV.active.deals.filter((a) => a.stage !== 'DEAD').length} live)</div>
+          <div class="k">Synced</div><div class="v">${esc(NV.active.syncedAt)} via Airtable connector</div>
+          <div class="k">Refresh</div><div class="v">Tell Claude in Cowork to "re-sync Airtable deals" — new DM deals you're entering will flow in on the next sync.</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Source 1 — Google Sheet (audited inbound)</h3>
         <div class="kv-grid">
           <div class="k">Google Sheet</div><div class="v"><a href="${esc(m.sourceSheet)}" target="_blank" rel="noopener">Open source workbook ↗</a></div>
           <div class="k">Record version</div><div class="v">${esc(m.recordVersion)} (QA pass + pricing revaluation complete)</div>
@@ -1042,4 +1150,4 @@ function viewSettings() {
   };
 }
 
-window.NVViews = { viewHome, viewDeals, viewPipeline, viewDealDetail, viewNegotiations, viewFollowups, viewResponses, viewBrands, viewContacts, viewFiles, viewAnalytics, viewRatecard, viewHealth, viewSettings };
+window.NVViews = { viewHome, viewDeals, viewPipeline, viewDealDetail, viewNegotiations, viewFollowups, viewResponses, viewBrands, viewContacts, viewFiles, viewAnalytics, viewRatecard, viewHealth, viewSettings, viewActive };

@@ -2,6 +2,7 @@
 
 const ROUTES = [
   { path: 'home', label: 'Home', ico: '⌂', view: 'viewHome', section: null },
+  { path: 'active', label: 'Active Deals', ico: '●', view: 'viewActive', section: 'Work', count: () => NV.active.deals.filter((a) => a.stage !== 'DEAD').length },
   { path: 'deals', label: 'Deals', ico: '▤', view: 'viewDeals', section: 'Work', count: () => NV.deals.length },
   { path: 'pipeline', label: 'Pipeline', ico: '⇶', view: 'viewPipeline', section: 'Work' },
   { path: 'negotiations', label: 'Negotiations', ico: '⇄', view: 'viewNegotiations', section: 'Work', count: () => NV.deals.filter(isActionable).length },
@@ -111,7 +112,9 @@ const CmdK = (() => {
         .slice(0, 4).map((x) => ({ t: x.subject, sub: x.id, ico: '✉', section: 'Drafts', go: () => (location.hash = `#/deal/${x.dealId}?tab=negotiation`) }));
       const brands = NV.research.filter((r) => (r.brand + ' ' + r.domain + ' ' + r.competitors).toLowerCase().includes(ql))
         .slice(0, 4).map((r) => ({ t: r.brand + ' — research', sub: r.domain, ico: '◈', section: 'Brand research', go: () => (location.hash = `#/deal/${r.dealId}?tab=research`) }));
-      items = [...nav, ...acts, ...deals, ...drafts, ...brands];
+      const actives = (NV.active?.deals || []).filter((a) => (a.brand + ' ' + a.stage + ' ' + a.notes).toLowerCase().includes(ql))
+        .slice(0, 4).map((a) => ({ t: `${a.brand} (Round ${a.round})`, sub: `${a.stage}${a.amount ? ' · $' + a.amount.toLocaleString() : ''}`, ico: '●', section: 'Active deals', go: () => (location.hash = '#/active') }));
+      items = [...nav, ...acts, ...actives, ...deals, ...drafts, ...brands];
     }
     sel = 0;
     render();
