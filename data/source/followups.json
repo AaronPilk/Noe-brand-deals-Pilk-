@@ -57,6 +57,14 @@
     { "dealId": "NV-DEAL-0010", "timing": "Within 1 week (recovery check)" },
     { "dealId": "NV-DEAL-0005", "timing": "Within 1 week (recovery check)" },
     { "dealId": "NV-DEAL-0009", "timing": "Within 1 week (recovery check)" },
-    { "dealId": "NV-DEAL-0012", "timing": "Within 1 week (recovery check)" }
+    { "dealId": "NV-DEAL-0012", "timing": "Within 1 week (recovery check)" },
+    { "dealId": "NV-DEAL-0066", "timing": "Within 48h" },
+    { "dealId": "NV-DEAL-0067", "timing": "Within 48h" },
+    { "dealId": "NV-DEAL-0068", "timing": "Within 48h" },
+    { "dealId": "NV-DEAL-0069", "timing": "Within 1 week" },
+    { "dealId": "NV-DEAL-0070", "timing": "Within 1 week" },
+    { "dealId": "NV-DEAL-0071", "timing": "Within 1 week" },
+    { "dealId": "NV-DEAL-0072", "timing": "Within 1 week" },
+    { "dealId": "NV-DEAL-0073", "timing": "Within 1 week" }
   ]
 }

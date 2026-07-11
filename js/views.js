@@ -4,12 +4,22 @@ const NV = window.NV_DATA;
 
 /* ---------------- helpers ---------------- */
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const fmt$ = (n) => n == null ? '—' : '$' + Number(n).toLocaleString('en-US');
-const pct = (p) => Math.round((p || 0) * 100) + '%';
+const fmt$ = (n) => n == null || n === '' ? '—' : '$' + Number(n).toLocaleString('en-US');
+const pct = (p) => p == null || p === '' ? '—' : Math.round(p * 100) + '%';
+const num = (n) => n == null || n === '' ? 0 : Number(n);
 const dealById = (id) => NV.deals.find((d) => d.deal_id === id);
 const draftByDeal = (id) => NV.drafts.find((x) => x.dealId === id);
+const draftsByDeal = (id) => NV.drafts.filter((x) => x.dealId === id);
 const draftById = (id) => NV.drafts.find((x) => x.id === id);
 const researchByDeal = (id) => NV.research.find((r) => r.dealId === id);
+const mcById = (id) => NV.manychat.records.find((m) => m.id === id);
+const mcForDeal = (dealId) => NV.manychat.records.filter((m) => m.linkedDealId === dealId || m.relatedDealId === dealId);
+
+/* Source-channel badges: email / Instagram DM via ManyChat / both */
+const CH_LABEL = { email: '✉ Email', manychat: '◇ DM', both: '✉+◇ Email + DM', unknown: '?' };
+const CH_TITLE = { email: 'Email', manychat: 'Instagram DM via ManyChat', both: 'Email + Instagram DM via ManyChat', unknown: 'Source unknown' };
+const chBadge = (ch) => `<span class="chip ${ch === 'both' ? 'purple' : ch === 'manychat' ? 'blue' : ''}" title="${CH_TITLE[ch] || ''}">${CH_LABEL[ch] || ''}</span>`;
+const chBadgeDraft = (ch) => ch === 'dm' ? '<span class="chip blue" title="Instagram DM via ManyChat">◇ DM</span>' : '<span class="chip" title="Email">✉ Email</span>';
 
 const GRADE_COLOR = { 'B': 'green', 'C': 'blue', 'D': 'amber', 'Reject/Archive': 'red' };
 const gradeChip = (g) => `<span class="chip ${GRADE_COLOR[g] || ''}">Grade ${esc(g)}</span>`;
@@ -69,8 +79,11 @@ function viewHome() {
   const money = NV.dashboard.money;
   const m = Object.fromEntries(money.map((x) => [x.key, x]));
 
-  const topNegotiations = [...viable].filter(isActionable).sort((a, b) => b.prob_weighted_usd - a.prob_weighted_usd).slice(0, 6);
-  const dueNow = NV.followups.filter((f) => f.timing.includes('24-48')).length;
+  const topNegotiations = [...viable].filter(isActionable).sort((a, b) => num(b.prob_weighted_usd) - num(a.prob_weighted_usd)).slice(0, 6);
+  const dueNow = NV.followups.filter((f) => /24-48|48h/.test(f.timing)).length;
+  const mc = NV.manychat.records;
+  const chn = NV.meta.channels;
+  const dmDraftsPending = NV.drafts.filter((x) => x.channel === 'dm' && !NVStore.getDraftStatus(x.dealId)).length;
   const highPriority = NV.followups.filter((f) => f.timing.includes('high priority'));
   const legal = NV.deals.filter((d) => d.legal_review === 'YES');
   const scams = NV.deals.filter((d) => ['High', 'Medium'].includes(d.scam_risk));
@@ -79,7 +92,7 @@ function viewHome() {
   const exceptions = NV.deals.filter((d) => d.strategic_exception_required === 'Yes');
   const approvals = NV.drafts.filter((x) => !NVStore.getDraftStatus(x.dealId));
 
-  const respondFirst = [...viable].filter(isActionable).sort((a, b) => b.prob_weighted_usd - a.prob_weighted_usd).slice(0, 5);
+  const respondFirst = [...viable].filter(isActionable).sort((a, b) => num(b.prob_weighted_usd) - num(a.prob_weighted_usd)).slice(0, 5);
 
   const moneyCard = (x, cls) => `
     <div class="card kpi">
@@ -92,7 +105,7 @@ function viewHome() {
     title: 'Home',
     html: `
     <h1 class="page-title">Good ${new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, Aaron</h1>
-    <div class="page-sub">${viable.length} viable deals · ${NV.drafts.length} drafts prepared · ${dueNow} follow-ups due within 48 hours</div>
+    <div class="page-sub">${NV.deals.length} deals (${chn.email} email · ${chn.manychat} DM · ${chn.both} both) · ${viable.length} viable · ${NV.drafts.length} drafts prepared · ${dueNow} follow-ups due within 48 hours</div>
 
     <div class="section-title">Today</div>
     <div class="grid cols-4">
@@ -115,6 +128,30 @@ function viewHome() {
         <div class="kpi-label">Deals needing a counter</div>
         <div class="kpi-value">${explicit.length}</div>
         <div class="kpi-note">${explicit.map((d) => `${esc(d.brand)} (${fmt$(d.explicit_cash_usd)} offered)`).join(' · ')}</div>
+      </div>
+    </div>
+
+    <div class="section-title">ManyChat discovery <span class="hint">Instagram DM audit — ${esc(NV.manychat.syncedAt)}</span></div>
+    <div class="grid cols-4">
+      <div class="card kpi" style="cursor:pointer" onclick="location.hash='#/manychat'">
+        <div class="kpi-label">Commercial DM conversations</div>
+        <div class="kpi-value">${mc.length}</div>
+        <div class="kpi-note">${mc.filter((x) => x.classification === 'New Deal').length} new deals · ${mc.filter((x) => x.classification === 'Existing Deal Enriched').length} existing deals enriched.</div>
+      </div>
+      <div class="card kpi" style="cursor:pointer" onclick="location.hash='#/responses'">
+        <div class="kpi-label">DM drafts awaiting review</div>
+        <div class="kpi-value">${dmDraftsPending}</div>
+        <div class="kpi-note">All held: “HOLD — human review &amp; send manually.”</div>
+      </div>
+      <div class="card kpi" style="cursor:pointer" onclick="location.hash='#/manychat?filter=Possible Duplicate'">
+        <div class="kpi-label">Possible duplicates</div>
+        <div class="kpi-value">${mc.filter((x) => x.classification === 'Possible Duplicate').length}</div>
+        <div class="kpi-note">Dreamina intermediary approaches — no pipeline value until authorization is verified.</div>
+      </div>
+      <div class="card kpi" style="cursor:pointer" onclick="location.hash='#/manychat?filter=Needs Manual Review'">
+        <div class="kpi-label">Manual review / conflicts</div>
+        <div class="kpi-value">${mc.filter((x) => x.classification === 'Needs Manual Review').length + mc.filter((x) => x.channelConflict).length}</div>
+        <div class="kpi-note">Riya (undisclosed brand) · Higgsfield direct-brand vs agency route.</div>
       </div>
     </div>
 
@@ -234,6 +271,12 @@ function viewDeals(params) {
         <select id="f-grade"><option value="">Grade: all</option><option>B</option><option>C</option><option>D</option><option>Reject/Archive</option></select>
         <select id="f-struct"><option value="">Structure: all</option>${Object.keys(NV.dashboard.structureCounts).map((s) => `<option>${esc(s)}</option>`).join('')}</select>
         <select id="f-stage"><option value="">Stage: all</option>${STAGES.map((s) => `<option>${s}</option>`).join('')}</select>
+        <select id="f-channel">
+          <option value="">Source: all</option>
+          <option value="email" ${filter === 'email' ? 'selected' : ''}>Email only</option>
+          <option value="manychat" ${filter === 'manychat' ? 'selected' : ''}>ManyChat only</option>
+          <option value="both" ${filter === 'both' ? 'selected' : ''}>Email + ManyChat</option>
+        </select>
         <select id="f-special">
           <option value="">Flags: all</option>
           <option value="legal" ${filter === 'legal' ? 'selected' : ''}>Legal review</option>
@@ -243,6 +286,9 @@ function viewDeals(params) {
           <option value="nobudget">No budget disclosed</option>
           <option value="exception">Strategic exception</option>
           <option value="stale">Stale (>20d)</option>
+          <option value="conflict" ${filter === 'conflict' ? 'selected' : ''}>Channel conflict</option>
+          <option value="duplicate" ${filter === 'duplicate' ? 'selected' : ''}>Possible-duplicate related</option>
+          <option value="dmlink">ManyChat conversation available</option>
         </select>
         <span class="count" id="f-count"></span>
       </div>
@@ -252,37 +298,41 @@ function viewDeals(params) {
       </table></div>`,
     mount() {
       const body = document.getElementById('deals-body');
-      const inputs = ['f-q', 'f-grade', 'f-struct', 'f-stage', 'f-special'].map((id) => document.getElementById(id));
+      const inputs = ['f-q', 'f-grade', 'f-struct', 'f-stage', 'f-channel', 'f-special'].map((id) => document.getElementById(id));
       const render = () => {
-        const [q, g, st, stage, sp] = inputs.map((i) => i.value);
+        const [q, g, st, stage, ch, sp] = inputs.map((i) => i.value);
         const ql = q.toLowerCase();
         let list = NV.deals.filter((d) =>
-          (!q || (d.brand + d.product + d.agency + d.contact_email + d.deal_id).toLowerCase().includes(ql)) &&
+          (!q || (d.brand + d.product + d.agency + d.contact_email + d.deal_id + ' ' + d.manychat_ids.map((m) => { const r = mcById(m); return r ? (r.ig || '') + ' ' + r.contact : ''; }).join(' ')).toLowerCase().includes(ql)) &&
           (!g || d.grade === g) &&
           (!st || d.commercial_structure === st) &&
           (!stage || dealStage(d) === stage) &&
+          (!ch || d.source_channel === ch) &&
           (!sp || (
             sp === 'legal' ? d.legal_review === 'YES' :
             sp === 'counter' ? d.explicit_cash_usd > 0 :
             sp === 'scam' ? d.scam_risk !== 'None Observed' :
-            sp === 'rights' ? d.rights_flags !== 'None detected' :
+            sp === 'rights' ? d.rights_flags && d.rights_flags !== 'None detected' :
             sp === 'nobudget' ? d.explicit_cash_usd === 0 && isViable(d) :
             sp === 'exception' ? d.strategic_exception_required === 'Yes' :
-            sp === 'stale' ? d.days_since_contact > 20 && isActionable(d) : true))
+            sp === 'stale' ? d.days_since_contact > 20 && isActionable(d) :
+            sp === 'conflict' ? mcForDeal(d.deal_id).some((m) => m.channelConflict) :
+            sp === 'duplicate' ? mcForDeal(d.deal_id).some((m) => m.classification === 'Possible Duplicate') :
+            sp === 'dmlink' ? mcForDeal(d.deal_id).some((m) => m.link) : true))
         );
-        list = [...list].sort((a, b) => b.prob_weighted_usd - a.prob_weighted_usd);
+        list = [...list].sort((a, b) => num(b.prob_weighted_usd) - num(a.prob_weighted_usd));
         document.getElementById('f-count').textContent = `${list.length} of ${NV.deals.length}`;
         body.innerHTML = list.map((d) => `
           <tr data-href="${dealLink(d.deal_id)}" ${rowClick}>
-            <td><b>${esc(d.brand)}</b><br><span style="color:var(--text-3);font-size:11.5px">${esc(d.deal_id)}${d.agency ? ' · via ' + esc(d.agency.split(' (')[0]) : ''}</span></td>
+            <td><b>${esc(d.brand)}</b> ${chBadge(d.source_channel)}<br><span style="color:var(--text-3);font-size:11.5px">${esc(d.deal_id)}${d.agency ? ' · via ' + esc(d.agency.split(' (')[0]) : ''}</span></td>
             <td style="font-size:12.5px;color:var(--text-2)">${esc(d.ai_category)}</td>
             <td>${gradeChip(d.grade)}</td>
             <td style="font-size:12.5px">${esc(dealStage(d))}</td>
             <td class="money">${d.explicit_cash_usd > 0 ? `<b>${fmt$(d.explicit_cash_usd)}</b>` : '<span style="color:var(--text-3)">—</span>'}</td>
-            <td class="money">${d.total_recommended_opening_ask > 0 ? fmt$(d.total_recommended_opening_ask) : '—'}</td>
+            <td class="money">${num(d.total_recommended_opening_ask) > 0 ? fmt$(d.total_recommended_opening_ask) : '—'}</td>
             <td class="money">${fmt$(d.prob_weighted_usd)}</td>
             <td class="num">${pct(d.close_probability)}</td>
-            <td class="num">${d.days_since_contact}d</td>
+            <td class="num">${d.days_since_contact === '' || d.days_since_contact == null ? '—' : d.days_since_contact + 'd'}</td>
             <td>${d.legal_review === 'YES' ? '<span class="chip red">Legal</span>' : ''}${scamChip(d.scam_risk)}${d.strategic_exception_required === 'Yes' ? '<span class="chip purple">Exception</span>' : ''}</td>
           </tr>`).join('');
       };
@@ -304,11 +354,11 @@ function viewPipeline() {
         ${cols.map((c) => `
           <div class="board-col">
             <h4>${esc(c.stage)} <span>${c.deals.length} · ${fmt$(c.deals.reduce((s, d) => s + (d.prob_weighted_usd || 0), 0))}</span></h4>
-            ${c.deals.sort((a, b) => b.prob_weighted_usd - a.prob_weighted_usd).map((d) => `
+            ${c.deals.sort((a, b) => num(b.prob_weighted_usd) - num(a.prob_weighted_usd)).map((d) => `
               <div class="board-card" onclick="location.hash='${dealLink(d.deal_id)}'">
                 <div class="bc-brand">${esc(d.brand)}</div>
                 <div class="bc-val">${d.explicit_cash_usd > 0 ? fmt$(d.explicit_cash_usd) + ' offered · ' : ''}${fmt$(d.prob_weighted_usd)} weighted</div>
-                <div class="bc-meta">${gradeChip(d.grade)}${d.legal_review === 'YES' ? '<span class="chip red">Legal</span>' : ''}${scamChip(d.scam_risk)}</div>
+                <div class="bc-meta">${chBadge(d.source_channel)}${gradeChip(d.grade)}${d.legal_review === 'YES' ? '<span class="chip red">Legal</span>' : ''}${scamChip(d.scam_risk)}</div>
               </div>`).join('') || '<div class="empty" style="padding:18px">Empty</div>'}
           </div>`).join('')}
       </div>`
@@ -338,7 +388,19 @@ function viewDealDetail(id, params) {
     ['Exclusivity', d.exclusivity_fee]
   ].filter(([, v]) => v > 0);
 
+  const mcRecords = mcForDeal(id);
+  const allDrafts = draftsByDeal(id);
+  const latestDm = mcRecords.map((m) => m.latestDm).filter(Boolean).sort().pop() || null;
+  const preferredChannel = allDrafts.length ? (allDrafts[allDrafts.length - 1].channel === 'dm' ? 'Instagram DM via ManyChat' : 'Email') : (d.source_channel === 'manychat' ? 'Instagram DM via ManyChat' : 'Email');
+
   const banners = [];
+  if (id === 'NV-DEAL-0047' && mcRecords.some((m) => m.channelConflict))
+    banners.push(`<div class="banner red"><span>⚠︎</span><div><b>DIRECT BRAND + AGENCY ROUTE — VERIFY REPRESENTATION.</b> Higgsfield's partnerships lead (Abylay, @higgsfield.ai) reached out directly via DM while Heek/BDSJ Media (kavy@bdsjmedia.co) holds the email route. Ask whether the Claude MCP campaign is the same engagement before quoting either side. Preferred contact route: <b>unresolved until Aaron decides</b>. One deal, one valuation — no double-count.</div></div>`);
+  if (id === 'NV-DEAL-0028' && mcRecords.some((m) => m.classification === 'Possible Duplicate'))
+    banners.push(`<div class="banner amber"><span>⚠︎</span><div><b>POSSIBLE DUPLICATE / AGENCY AUTHORIZATION REQUIRES MANUAL REVIEW.</b> Two additional Dreamina approaches arrived via Instagram DM (${mcRecords.filter((m) => m.classification === 'Possible Duplicate').map((m) => `${esc(m.id)} — ${esc(m.brand)}`).join('; ')}). They are held as related approaches only: no pipeline IDs, no added value, until agency authorization is confirmed against Tec-Do.</div></div>`);
+  if (d.source_channel === 'both' && !banners.length)
+    banners.push(`<div class="banner blue"><span>◇</span><div><b>Enriched from ManyChat.</b> This email deal also has a live Instagram DM thread — both sources shown below, one deal, one valuation.</div></div>`);
+
   const twins = activeByBrand(d.brand);
   if (twins.length)
     banners.push(`<div class="banner blue"><span>◎</span><div><b>Also in Active Deals:</b> ${twins.map((a) => `${esc(a.brand)} Round ${a.round} — ${esc(a.stage)}${a.amount ? ' · ' + fmt$(a.amount) : ''}`).join(' · ')}. <a href="#/active">Open Active Deals</a> for delivery/payment state before negotiating here.</div></div>`);
@@ -353,6 +415,38 @@ function viewDealDetail(id, params) {
   if (d.minimum_package_applies === 'Yes' && d.strategic_exception_required !== 'Yes')
     banners.push(`<div class="banner blue"><span>▦</span><div><b>Minimum package applies:</b> $1,000/post · 3-post minimum · $3,000 organic floor. Rights and licensing priced separately on top.</div></div>`);
 
+  /* shared cards: communication sources + ManyChat context */
+  const commsCard = () => `
+      <div class="card">
+        <h3>Communication sources ${chBadge(d.source_channel)}</h3>
+        <div class="kv-grid">
+          ${d.gmail_thread_url ? `<div class="k">Email thread</div><div class="v"><a href="${esc(d.gmail_thread_url)}" target="_blank" rel="noopener">Open in Gmail ↗</a> · ${esc(d.contact_email)}</div>` : ''}
+          ${mcRecords.filter((m) => m.classification !== 'Possible Duplicate').map((m) => `
+            <div class="k">ManyChat DM</div><div class="v">${m.link ? `<a href="${esc(m.link)}" target="_blank" rel="noopener">Open in ManyChat ↗</a>` : '<span style="color:var(--text-3)">preview only — link not captured</span>'} · ${m.ig ? '@' + esc(m.ig) : esc(m.contact)}</div>`).join('')}
+          <div class="k">Preferred reply channel</div><div class="v">${id === 'NV-DEAL-0047' ? '<span class="chip amber">Unresolved — Aaron decides route</span>' : esc(preferredChannel)}</div>
+          ${latestDm ? `<div class="k">Latest DM activity</div><div class="v">${esc(latestDm)}</div>` : ''}
+          ${d.days_since_contact !== '' && d.days_since_contact != null ? `<div class="k">Latest interaction</div><div class="v">${d.days_since_contact} days ago${latestDm ? ' (email) — use newest across channels' : ''}</div>` : ''}
+        </div>
+      </div>`;
+
+  const mcCards = () => mcRecords.map((m) => `
+      <div class="card" style="border-left:3px solid ${m.classification === 'Possible Duplicate' ? 'var(--amber)' : 'var(--blue)'}">
+        <h3>ManyChat — ${esc(m.id)} <span class="chip ${m.classification === 'Possible Duplicate' ? 'amber' : m.classification === 'Needs Manual Review' ? 'red' : m.classification === 'Existing Deal Enriched' ? 'purple' : 'blue'}">${esc(m.classification)}</span></h3>
+        <div class="kv-grid">
+          <div class="k">Instagram</div><div class="v">${m.ig ? '@' + esc(m.ig) : '(handle not captured)'} · ${esc(m.contact)}</div>
+          <div class="k">Dates</div><div class="v">${esc(m.dates)}</div>
+          <div class="k">DM summary</div><div class="v">${esc(m.summary)}</div>
+          <div class="k">Offer</div><div class="v">${esc(m.offer)}</div>
+          ${m.rights && m.rights !== 'TBD' && m.rights !== 'N/A' ? `<div class="k">Rights</div><div class="v"><b style="color:var(--amber)">${esc(m.rights)}</b></div>` : ''}
+          <div class="k">Email match</div><div class="v">${esc(m.emailMatch)}</div>
+          <div class="k">Recommended</div><div class="v">${esc(m.action)}</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          ${m.link ? `<a class="btn sm" href="${esc(m.link)}" target="_blank" rel="noopener">Open in ManyChat ↗</a>` : ''}
+          ${draftById(m.draftId) ? `<button class="btn sm" onclick="location.hash='#/deal/${id}?tab=negotiation'">View draft ${esc(m.draftId)}</button>` : ''}
+        </div>
+      </div>`).join('');
+
   /* tab bodies */
   const tabBody = {
     overview: () => `
@@ -363,13 +457,15 @@ function viewDealDetail(id, params) {
           <div class="k">Product</div><div class="v">${esc(d.product)}</div>
           <div class="k">Category</div><div class="v">${esc(d.ai_category)}</div>
           <div class="k">Agency</div><div class="v">${d.agency ? esc(d.agency) : '<span style="color:var(--text-3)">Direct — no agency</span>'}</div>
-          <div class="k">Contact</div><div class="v"><a href="mailto:${esc(d.contact_email)}">${esc(d.contact_email)}</a></div>
+          <div class="k">Contact</div><div class="v">${d.contact_email ? `<a href="mailto:${esc(d.contact_email)}">${esc(d.contact_email)}</a>` : mcRecords.length ? esc(mcRecords.map((m) => (m.ig ? '@' + m.ig : m.contact)).join(', ')) : '—'}</div>
           <div class="k">Deal type</div><div class="v">${esc(d.deal_type)}</div>
           <div class="k">Last contact</div><div class="v">${d.days_since_contact} days ago${fu ? ` · follow-up: ${esc(fu.timing)}` : ''}</div>
           <div class="k">Audit score</div><div class="v">${d.total_score}/100 → ${gradeChip(d.grade)} <span class="chip">${esc(d.priority)} priority</span></div>
           <div class="k">Source</div><div class="v"><span class="chip">Imported from audit</span> ${esc(d.record_version)} · ${esc(d.data_last_updated)}</div>
         </div>
       </div>
+      ${commsCard()}
+      ${mcCards()}
       ${d.red_flags ? `<div class="card"><h3>Red flags noted in audit</h3><div style="font-size:13.5px;color:var(--text-2)">${esc(d.red_flags)}</div></div>` : ''}
       <div class="card">
         <h3>Recommended pricing structure ${estChip()}</h3>
@@ -400,6 +496,22 @@ function viewDealDetail(id, params) {
             <div class="k">Close probability</div><div class="v">${pct(d.close_probability)}<div class="prob-bar" style="max-width:180px"><div style="width:${d.close_probability * 100}%"></div></div></div>
           </div>
         </div>`;
+      const p = d.close_probability;
+      const standardCard = `
+        <div class="card" style="border-left:3px solid ${p != null && p >= STANDARD.target ? 'var(--green)' : 'var(--amber)'}">
+          <h3>The 50% Standard
+            ${p == null ? '<span class="chip">Not yet scored</span>' : p >= STANDARD.target ? `<span class="chip green">At standard — ${pct(p)}</span>` : `<span class="chip amber">Below standard — ${pct(p)} → target ${pct(STANDARD.target)}</span>`}
+          </h3>
+          <div style="font-size:12.5px;color:var(--text-2);margin-bottom:10px">Every viable negotiation gets engineered toward a ≥50% close. The number moves by applying levers — never by editing it. Update the working probability in your notes as levers land.</div>
+          ${STANDARD.levers.map((l) => {
+            const st = l.auto ? l.auto(d) : null;
+            return `<div class="list-item" style="cursor:default">
+              <span class="chip ${st === true ? 'green' : st === false ? 'amber' : ''}">${st === true ? '✓' : st === false ? '○' : '·'}</span>
+              <div style="min-width:0"><b style="font-size:13px">${l.label}</b>
+              <div style="font-size:12px;color:var(--text-3)">${l.why}</div></div>
+            </div>`;
+          }).join('')}
+        </div>`;
       const rec = `
         <div class="card" style="border-left:3px solid var(--purple)">
           <h3>Claude's recommendation <span class="chip purple">Generated by Claude</span></h3>
@@ -413,23 +525,17 @@ function viewDealDetail(id, params) {
           </div>
           <div style="margin-top:12px;font-size:12px;color:var(--text-3)">To iterate on strategy or regenerate this draft in your voice, work with Claude in Cowork — the repo and this deal's full context are already wired in. Edits you approve become voice examples below.</div>
         </div>`;
-      const draftBlock = draft ? `
-        <div class="section-title">Draft response <span class="hint">${esc(draft.responseType)}</span></div>
-        ${renderDraft(draft, d)}` : `
+      const draftBlock = allDrafts.length ? allDrafts.map((dr) => `
+        <div class="section-title">Draft response ${chBadgeDraft(dr.channel)} <span class="hint">${esc(dr.responseType)}</span></div>
+        ${renderDraft(dr, d)}`).join('') : `
         <div class="card"><div class="empty">No draft — this deal is marked ${esc(d.commercial_structure)}. ${d.commercial_structure === 'Do-not-engage' ? 'Do not respond.' : ''}</div></div>`;
-      return guardrails + position + rec + draftBlock;
+      return guardrails + position + standardCard + rec + draftBlock;
     },
 
     messages: () => `
-      <div class="card">
-        <h3>Thread</h3>
-        <div class="kv-grid">
-          <div class="k">Gmail thread</div><div class="v"><a href="${esc(d.gmail_thread_url)}" target="_blank" rel="noopener">Open in Gmail ↗</a></div>
-          <div class="k">Counterparty</div><div class="v">${esc(d.contact_email)}${d.agency ? ' · ' + esc(d.agency) : ''}</div>
-          <div class="k">Last activity</div><div class="v">${d.days_since_contact} days ago</div>
-        </div>
-      </div>
-      ${draft ? `<div class="section-title">Prepared reply</div>${renderDraft(draft, d)}` : '<div class="card"><div class="empty">No prepared reply for this deal.</div></div>'}
+      ${commsCard()}
+      ${mcCards()}
+      ${allDrafts.length ? allDrafts.map((dr) => `<div class="section-title">Prepared reply ${chBadgeDraft(dr.channel)}</div>${renderDraft(dr, d)}`).join('') : '<div class="card"><div class="empty">No prepared reply for this deal.</div></div>'}
       <div class="card" style="margin-top:14px">
         <h3>Log a brand reply</h3>
         <div style="font-size:12.5px;color:var(--text-3);margin-bottom:8px">Paste what the brand said — it lands in the activity history, and Claude uses it as context for the next counter.</div>
@@ -551,6 +657,7 @@ function viewDealDetail(id, params) {
         <div class="deal-title">${esc(d.brand)}</div>
         <div class="deal-subtitle">${esc(d.product)} · ${esc(d.deal_id)}</div>
         <div class="deal-chips">
+          ${chBadge(d.source_channel)}
           ${gradeChip(d.grade)}
           <span class="chip">${esc(d.priority)} priority</span>
           ${structChip(d.commercial_structure)}
@@ -627,10 +734,29 @@ function viewDealDetail(id, params) {
   };
 }
 
+/* THE 50% STANDARD — every viable negotiation is engineered toward >=50% close probability.
+ * Probabilities are never edited to hit the number; the levers below move the real odds.
+ * Aaron updates the working probability from the deal page as levers land. */
+const STANDARD = {
+  target: 0.5,
+  levers: [
+    { key: 'speed', label: 'Respond within 48h', why: 'Fresh threads close at a multiple of stale ones. Every viable inbound gets an answer inside two days.', auto: (d) => num(d.days_since_contact) <= 2 || !!NVStore.getDraftStatus(d.deal_id) },
+    { key: 'budget', label: 'Budget surfaced in exchange #1', why: 'Never quote blind. First reply always asks for budget + scope — you price the second message, not the first.', auto: (d) => d.explicit_cash_usd > 0 },
+    { key: 'anchor', label: 'Anchor with the package', why: 'State the 3-post / $3,000 floor confidently. Anchors set the range; apologetic pricing kills probability.', auto: (d) => num(d.total_recommended_opening_ask) > 0 },
+    { key: 'twopath', label: 'Two-path close (scope down, never price down)', why: 'Offer Package A (full) and Package B (reduced deliverables or shorter rights). A choice between two yeses beats yes/no.', auto: null },
+    { key: 'rights', label: 'Rights unbundled', why: 'Usage, whitelisting, exclusivity priced separately — protects value and creates trade room for the close.', auto: (d) => !d.rights_flags || d.rights_flags === 'None detected' || num(d.licensing_fee) + num(d.paid_usage_fee) + num(d.exclusivity_fee) > 0 },
+    { key: 'deadline', label: 'Deadline on every quote', why: 'Quotes carry a validity window or a scheduling anchor ("locking July slots this week"). Open-ended offers drift to zero.', auto: null },
+    { key: 'dm', label: 'Decision-maker verified', why: 'Confirm the contact can sign — agency authority checked before terms move.', auto: null },
+    { key: 'nextstep', label: 'Every message ends with a next step', why: 'A concrete question or CTA in every send. No message ends flat.', auto: null }
+  ]
+};
+
 /* Full negotiation briefing for Claude — one paste gives complete deal context */
 function buildClaudeContext(id) {
   const d = dealById(id);
-  const draft = draftByDeal(id);
+  const drafts = draftsByDeal(id);
+  const draft = drafts[0];
+  const mcs = mcForDeal(id);
   const res = researchByDeal(id);
   const vp = NVStore.getVoiceProfile();
   const notes = NVStore.getNotes(id);
@@ -643,7 +769,8 @@ You are drafting as Aaron, manager of Noe Varner's brand partnerships. Recommend
 ## Deal
 - Product: ${d.product} (${d.ai_category})
 - Agency: ${d.agency || 'none — direct'}
-- Contact: ${d.contact_email}
+- Contact: ${d.contact_email || mcs.map((m) => (m.ig ? '@' + m.ig : m.contact)).join(', ') || 'unknown'}
+- Source channel: ${CH_TITLE[d.source_channel]}${d.source_channel === 'both' ? ' — one deal, both threads; do not double-count value' : ''}
 - Type/structure: ${d.deal_type} / ${d.commercial_structure}
 - Audit: ${d.total_score}/100, grade ${d.grade}, ${d.priority} priority, stage ${dealStage(d)}
 - Last contact: ${d.days_since_contact} days ago
@@ -678,14 +805,19 @@ Greeting: ${vp.greeting} · Sign-off: ${vp.signoff.replace(/\n/g, ' / ')}
 Never use: ${vp.banned}
 ${lib.length ? `\n## Approved voice examples (match these over everything else)\n${lib.slice(0, 2).map((x) => `---\nSubject: ${x.subject}\n${x.body}`).join('\n')}` : ''}
 
-## Current prepared draft (${draft ? draft.id + ' — on hold' : 'none'})
-${draft ? `Subject: ${draft.subject}\n${draft.body}` : '(no draft — ' + d.commercial_structure + ')'}
+${mcs.length ? `## ManyChat DM context\n${mcs.map((m) => `${m.id} [${m.classification}] @${m.ig || '?'} (${m.contact}) — ${m.dates}\nSummary: ${m.summary}\nOffer: ${m.offer}${m.rights && m.rights !== 'TBD' ? `\nRights requested: ${m.rights}` : ''}\nAudit action: ${m.action}`).join('\n---\n')}\nDM style note: DM replies must be short, natural, and direct — no email formality, no signature block.\n` : ''}
+## Prepared drafts (all on hold)
+${drafts.length ? drafts.map((dr) => `[${dr.channel.toUpperCase()}] ${dr.id} — ${dr.subject}\n${dr.body}`).join('\n---\n') : '(no draft — ' + d.commercial_structure + ')'}
 
 ${notes.length ? `## Aaron's notes\n${notes.map((n) => '- ' + n.text).join('\n')}` : ''}
 ${activity.length ? `## Recent activity\n${activity.map((a) => `- [${a.source}] ${a.title}${a.detail ? ': ' + a.detail : ''}`).join('\n')}` : ''}
 
+## The 50% Standard (apply to every reply)
+Engineer this deal toward a >=50% close probability using levers, never by inflating numbers:
+respond fast; surface budget in the first exchange (never quote blind); anchor confidently with the package; close with two paths (scope down, never price down); keep rights unbundled as trade room; put a validity window or scheduling anchor on every quote; verify the decision-maker/agency authority; end every message with a concrete next step. Current audited probability: ${d.close_probability ?? 'not scored'}.
+
 ## Task
-Analyze the brand's latest message (pasted below), tell Aaron: what they're asking, what changed, what it's worth, the exact counter and why, what not to concede, what to trade, push/hold/accept/clarify/walk, close likelihood, main risk. Then write the reply in Aaron's voice with subject line, recommended counter amount, protected terms, and internal notes.
+Analyze the brand's latest message (pasted below), tell Aaron: what they're asking, what changed, what it's worth, the exact counter and why, what not to concede, what to trade, push/hold/accept/clarify/walk, close likelihood, main risk. Then write the reply in Aaron's voice (short and natural if DM) with subject line (email only), recommended counter amount, protected terms, and internal notes. State which 50%-standard levers the reply applies.
 
 BRAND'S LATEST MESSAGE:
 [paste here]`;
@@ -695,18 +827,21 @@ BRAND'S LATEST MESSAGE:
 function renderDraft(draft, d) {
   const status = NVStore.getDraftStatus(d.deal_id);
   const mark = NVStore.getVoiceMark(d.deal_id, draft.id);
+  const isDm = draft.channel === 'dm';
+  const mcLink = isDm ? (mcForDeal(d.deal_id).find((m) => m.link) || {}).link : null;
   return `
   <div class="draft-box" id="draft-${esc(draft.id)}">
     <div class="draft-head">
       <div>
-        <div class="draft-subject">${esc(draft.subject)}</div>
-        <div style="font-size:12px;color:var(--text-3);margin-top:2px">To: ${esc(draft.recipient)} · ${esc(draft.id)} · <span class="chip amber">HOLD — review before sending</span>${status ? ` <span class="chip ${status === 'Approved internally' ? 'green' : 'blue'}">${esc(status)}</span>` : ''}</div>
+        <div class="draft-subject">${esc(draft.subject)} ${chBadgeDraft(draft.channel)}</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:2px">To: ${esc(draft.recipient)} · ${esc(draft.id)} · <span class="chip amber">${esc(draft.doNotSendUntil || 'HOLD — review before sending')}</span>${status ? ` <span class="chip ${status === 'Approved internally' ? 'green' : 'blue'}">${esc(status)}</span>` : ''}</div>
       </div>
       ${draft.exception ? '<span class="chip purple">EXCEPTION REQUIRES AARON APPROVAL</span>' : ''}
     </div>
     <div class="draft-body">${esc(draft.body)}</div>
     <div class="draft-actions">
-      <button class="btn sm primary" data-act="copy" data-draft="${esc(draft.id)}">Copy draft</button>
+      <button class="btn sm primary" data-act="copy" data-draft="${esc(draft.id)}">${isDm ? 'Copy DM' : 'Copy draft'}</button>
+      ${mcLink ? `<a class="btn sm" href="${esc(mcLink)}" target="_blank" rel="noopener">Open ManyChat ↗</a>` : ''}
       <button class="btn sm" data-act="approve" data-draft="${esc(draft.id)}">Approve internally</button>
       <button class="btn sm" data-act="sent" data-draft="${esc(draft.id)}">Mark as sent manually</button>
       <select class="voice-mark" data-draft="${esc(draft.id)}" style="width:auto;font-size:12px;padding:4px 8px">
@@ -722,7 +857,7 @@ function bindDraftActions(dealId) {
     btn.addEventListener('click', () => {
       const draft = draftById(btn.dataset.draft);
       if (!draft) return;
-      if (btn.dataset.act === 'copy') copyText(`Subject: ${draft.subject}\n\n${draft.body}`, 'Draft copied — paste into Gmail');
+      if (btn.dataset.act === 'copy') copyText(draft.channel === 'dm' ? draft.body : `Subject: ${draft.subject}\n\n${draft.body}`, draft.channel === 'dm' ? 'DM copied — paste into ManyChat/Instagram' : 'Draft copied — paste into Gmail');
       if (btn.dataset.act === 'approve') { NVStore.setDraftStatus(draft.dealId, 'Approved internally'); toast('Approved internally'); renderRoute(); }
       if (btn.dataset.act === 'sent') { NVStore.setDraftStatus(draft.dealId, 'Sent manually'); NVStore.setStage(draft.dealId, 'In Negotiation', 'Response sent'); toast('Marked sent — stage moved to In Negotiation'); renderRoute(); }
     });
@@ -737,7 +872,7 @@ function bindDraftActions(dealId) {
 
 /* ---------------- NEGOTIATIONS ---------------- */
 function viewNegotiations() {
-  const active = NV.deals.filter(isActionable).sort((a, b) => b.prob_weighted_usd - a.prob_weighted_usd);
+  const active = NV.deals.filter(isActionable).sort((a, b) => num(b.prob_weighted_usd) - num(a.prob_weighted_usd));
   return {
     title: 'Negotiations',
     html: `
@@ -752,7 +887,7 @@ function viewNegotiations() {
           const ds = NVStore.getDraftStatus(d.deal_id);
           return `
           <tr data-href="#/deal/${d.deal_id}?tab=negotiation" ${rowClick}>
-            <td><b>${esc(d.brand)}</b><br><span style="color:var(--text-3);font-size:11.5px">${esc(d.deal_id)}</span></td>
+            <td><b>${esc(d.brand)}</b> ${chBadge(d.source_channel)}<br><span style="color:var(--text-3);font-size:11.5px">${esc(d.deal_id)}</span></td>
             <td>${gradeChip(d.grade)}</td>
             <td class="money">${d.explicit_cash_usd > 0 ? fmt$(d.explicit_cash_usd) : '<span style="color:var(--text-3)">—</span>'}</td>
             <td class="money">${fmt$(d.total_recommended_opening_ask)}</td>
@@ -831,31 +966,92 @@ function viewActive() {
   };
 }
 
+/* ---------------- MANYCHAT AUDIT ---------------- */
+function viewManychat(params) {
+  const filter = params?.get('filter') || '';
+  const CLS_COLOR = { 'New Deal': 'blue', 'Existing Deal Enriched': 'purple', 'Possible Duplicate': 'amber', 'Needs Manual Review': 'red', 'Scam or Suspicious': 'red' };
+  const FILTERS = ['New Deal', 'Existing Deal Enriched', 'Possible Duplicate', 'Scam or Suspicious', 'Needs Manual Review', 'Response Ready', 'No Response Recommended'];
+  return {
+    title: 'ManyChat Audit',
+    html: `
+      <h1 class="page-title">ManyChat Audit</h1>
+      <div class="page-sub">${NV.manychat.records.length} relevant commercial DM conversations from the Instagram audit. This is a source-management view, not a second pipeline — pipeline value lives only on the linked Deal IDs.</div>
+      <div class="filters">
+        <select id="mc-filter">
+          <option value="">All classifications</option>
+          ${FILTERS.map((f) => `<option ${f === filter ? 'selected' : ''}>${f}</option>`).join('')}
+        </select>
+        <span class="count" id="mc-count"></span>
+      </div>
+      <div id="mc-list"></div>
+      <div class="banner blue" style="margin-top:14px"><span>ℹ</span><div>The audit's planning notes referenced a suspicious "Cognexia" solicitation, but no such record exists in the live workbook — nothing was imported for it. If it lands in the ManyChat Audit tab later, the next sync picks it up.</div></div>`,
+    mount() {
+      const sel = document.getElementById('mc-filter');
+      const render = () => {
+        const f = sel.value;
+        let list = NV.manychat.records.filter((m) =>
+          !f ? true :
+          f === 'Response Ready' ? !!draftById(m.draftId) :
+          f === 'No Response Recommended' ? !draftById(m.draftId) && !m.draftId?.startsWith('RD-MC') :
+          m.classification === f);
+        document.getElementById('mc-count').textContent = `${list.length} of ${NV.manychat.records.length}`;
+        document.getElementById('mc-list').innerHTML = `<div class="grid cols-2">` + list.map((m) => `
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+              <h3 style="margin:0">${esc(m.id)} — ${esc(m.brand)}</h3>
+              <span class="chip ${CLS_COLOR[m.classification] || ''}">${esc(m.classification)}</span>
+            </div>
+            <div class="kv-grid" style="margin-top:10px">
+              <div class="k">Instagram</div><div class="v">${m.ig ? '@' + esc(m.ig) : '(not captured)'} · ${esc(m.contact)}</div>
+              <div class="k">Dates</div><div class="v">${esc(m.dates)}</div>
+              <div class="k">Summary</div><div class="v">${esc(m.summary)}</div>
+              <div class="k">Offer</div><div class="v">${esc(m.offer)}</div>
+              ${m.rights && m.rights !== 'TBD' && m.rights !== 'N/A' ? `<div class="k">Rights</div><div class="v" style="color:var(--amber)">${esc(m.rights)}</div>` : ''}
+              <div class="k">Email match</div><div class="v">${esc(m.emailMatch)}</div>
+              <div class="k">Deal</div><div class="v">${m.linkedDealId ? `<a href="${dealLink(m.linkedDealId)}">${esc(m.linkedDealId)}</a>` : m.relatedDealId ? `related: <a href="${dealLink(m.relatedDealId)}">${esc(m.relatedDealId)}</a> (no own pipeline ID)` : '<span style="color:var(--text-3)">none — manual review</span>'}</div>
+              <div class="k">Action</div><div class="v">${esc(m.action)}</div>
+              <div class="k">Draft</div><div class="v">${draftById(m.draftId) ? `<a href="#/deal/${draftById(m.draftId).dealId}?tab=negotiation">${esc(m.draftId)}</a>` : esc(m.draftId || '—') + ' <span style="color:var(--text-3)">(sheet draft, not imported as sendable)</span>'}</div>
+            </div>
+            ${m.link ? `<div style="margin-top:10px"><a class="btn sm" href="${esc(m.link)}" target="_blank" rel="noopener">Open in ManyChat ↗</a></div>` : ''}
+          </div>`).join('') + '</div>';
+      };
+      sel.addEventListener('input', render);
+      render();
+    }
+  };
+}
+
 /* ---------------- FOLLOW-UPS ---------------- */
 function viewFollowups() {
   const groups = [
-    ['Within 24–48 hours', NV.followups.filter((f) => f.timing.includes('24-48'))],
+    ['Within 24–48 hours', NV.followups.filter((f) => /24-48|48h/.test(f.timing))],
     ['Within 3–5 days', NV.followups.filter((f) => f.timing.includes('3-5'))],
-    ['Within 1 week (recovery)', NV.followups.filter((f) => f.timing.includes('1 week'))]
+    ['Within 1 week', NV.followups.filter((f) => f.timing.includes('1 week'))]
   ];
+  const srcLink = (f) => {
+    if (f.gmail && /^https?:/.test(f.gmail)) return `<a href="${esc(f.gmail)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Gmail ↗</a>`;
+    const m = (f.manychatIds || []).map(mcById).find((x) => x && x.link);
+    return m ? `<a href="${esc(m.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">ManyChat ↗</a>` : '<span style="color:var(--text-3)">—</span>';
+  };
   return {
     title: 'Follow-Ups',
     html: `
       <h1 class="page-title">Follow-Ups</h1>
-      <div class="page-sub">${NV.followups.length} queued from the audit, grouped by urgency. High-priority rows are the grade-B deals.</div>
+      <div class="page-sub">${NV.followups.length} queued from the audit (57 email + 8 DM), grouped by urgency. Houston and Higgsfield stay unified — their DM follow-ups live on the same deal.</div>
       ${groups.map(([label, rows]) => `
         <div class="section-title">${label} <span class="hint">${rows.length}</span></div>
         <div class="tbl-wrap"><table class="tbl">
-          <thead><tr><th>Deal</th><th>Priority</th><th>Grade</th><th>Days</th><th>Action</th><th></th></tr></thead>
+          <thead><tr><th>Deal</th><th>Source</th><th>Priority</th><th>Grade</th><th>Days</th><th>Action</th><th></th></tr></thead>
           <tbody>
           ${rows.map((f) => `
             <tr data-href="${dealLink(f.dealId)}" ${rowClick}>
               <td><b>${esc(f.brand)}</b><br><span style="color:var(--text-3);font-size:11.5px">${esc(f.dealId)}</span></td>
+              <td>${chBadge(f.channel)}</td>
               <td>${f.timing.includes('high priority') ? '<span class="chip green">High</span>' : `<span class="chip">${esc(f.priority)}</span>`}</td>
               <td>${gradeChip(f.grade)}</td>
-              <td class="num">${f.days}d</td>
+              <td class="num">${f.days === '' || f.days == null ? '—' : f.days + 'd'}</td>
               <td style="font-size:12.5px;color:var(--text-2);max-width:320px">${esc(f.action)}</td>
-              <td><a href="${esc(f.gmail)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Gmail ↗</a></td>
+              <td>${srcLink(f)}</td>
             </tr>`).join('')}
           </tbody>
         </table></div>`).join('')}`
@@ -880,8 +1076,9 @@ function viewResponses() {
             <div class="list-item" onclick="location.hash='#/deal/${x.dealId}?tab=negotiation'">
               <div style="min-width:0;flex:1">
                 <b style="font-size:13.5px">${esc(x.brand)}</b>
-                <div style="font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(x.subject)}</div>
+                <div style="font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(x.subject)} · to ${esc(x.recipient)}</div>
               </div>
+              ${chBadgeDraft(x.channel)}
               ${x.exception ? '<span class="chip purple">Exception</span>' : ''}
               ${st ? `<span class="chip ${st === 'Approved internally' ? 'green' : 'blue'}">${esc(st)}</span>` : '<span class="chip amber">Hold</span>'}
             </div>`; }).join('')}
@@ -919,7 +1116,7 @@ function viewContacts() {
     if (!map[key]) map[key] = { email: d.contact_email, agency: d.agency, deals: [] };
     map[key].deals.push(d);
   });
-  const contacts = Object.values(map).sort((a, b) => b.deals.reduce((s, d) => s + d.prob_weighted_usd, 0) - a.deals.reduce((s, d) => s + d.prob_weighted_usd, 0));
+  const contacts = Object.values(map).sort((a, b) => b.deals.reduce((s, d) => s + num(d.prob_weighted_usd), 0) - a.deals.reduce((s, d) => s + num(d.prob_weighted_usd), 0));
   return {
     title: 'Contacts',
     html: `
@@ -977,10 +1174,10 @@ function viewFiles() {
 function viewAnalytics() {
   const viable = NV.deals.filter(isViable);
   const byCat = {};
-  viable.forEach((d) => { byCat[d.ai_category] = (byCat[d.ai_category] || 0) + d.prob_weighted_usd; });
+  viable.forEach((d) => { byCat[d.ai_category] = (byCat[d.ai_category] || 0) + num(d.prob_weighted_usd); });
   const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]).slice(0, 10);
   const byStruct = Object.entries(NV.dashboard.structureCounts);
-  const top = [...viable].sort((a, b) => b.prob_weighted_usd - a.prob_weighted_usd).slice(0, 10);
+  const top = [...viable].sort((a, b) => num(b.prob_weighted_usd) - num(a.prob_weighted_usd)).slice(0, 10);
   const grades = Object.entries(NV.dashboard.pipelineSummary.gradeDistribution);
   return {
     title: 'Analytics',
@@ -1047,6 +1244,21 @@ function viewHealth() {
         <div class="card kpi"><div class="kpi-label">Your changes logged</div><div class="kpi-value">${opsCount}</div><div class="kpi-note">Operational events in this browser's activity history.</div></div>
       </div>
       <div class="card" style="margin-top:16px">
+        <h3>Channel & ManyChat integrity</h3>
+        <div class="kv-grid">
+          <div class="k">Source breakdown</div><div class="v">${NV.meta.channels.email} email-only · ${NV.meta.channels.manychat} ManyChat-only · ${NV.meta.channels.both} email + ManyChat</div>
+          <div class="k">ManyChat audit rows</div><div class="v">${NV.meta.manychatCount} (synced ${esc(NV.meta.manychatSyncedAt)})</div>
+          <div class="k">Linked to deals</div><div class="v">${NV.manychat.records.filter((m) => m.linkedDealId).length} linked · ${NV.manychat.records.filter((m) => !m.linkedDealId).length} unlinked (held for manual review — Riya + 2 Dreamina intermediaries)</div>
+          <div class="k">Possible duplicates</div><div class="v">${NV.manychat.records.filter((m) => m.classification === 'Possible Duplicate').length} — excluded from pipeline value</div>
+          <div class="k">Channel conflicts</div><div class="v">${NV.manychat.records.filter((m) => m.channelConflict).length} — Higgsfield direct-brand vs agency route</div>
+          <div class="k">Missing ManyChat URLs</div><div class="v">${NV.manychat.records.filter((m) => !m.link).length} (preview-only conversations)</div>
+          <div class="k">Missing email threads</div><div class="v">${NV.deals.filter((d) => d.source_channel === 'manychat').length} DM-only deals (expected — no email yet)</div>
+          <div class="k">Max deal ID</div><div class="v">NV-DEAL-00${Math.max(...NV.deals.map((d) => +d.deal_id.slice(-4)))} · ${NV.deals.length} unique rows</div>
+          <div class="k">Backup tabs</div><div class="v"><span class="chip green">Ignored — only active tabs consumed</span></div>
+          <div class="k">Parse warnings</div><div class="v">${NV.meta.warnings?.length ? NV.meta.warnings.map(esc).join('<br>') : '<span class="chip green">None</span>'}</div>
+        </div>
+      </div>
+      <div class="card">
         <h3>Source 2 — Airtable (live deals)</h3>
         <div class="kv-grid">
           <div class="k">Table</div><div class="v">Content System → Brand Deals (${NV.active.deals.length} records, ${NV.active.deals.filter((a) => a.stage !== 'DEAD').length} live)</div>
@@ -1150,4 +1362,4 @@ function viewSettings() {
   };
 }
 
-window.NVViews = { viewHome, viewDeals, viewPipeline, viewDealDetail, viewNegotiations, viewFollowups, viewResponses, viewBrands, viewContacts, viewFiles, viewAnalytics, viewRatecard, viewHealth, viewSettings, viewActive };
+window.NVViews = { viewHome, viewDeals, viewPipeline, viewDealDetail, viewNegotiations, viewFollowups, viewResponses, viewBrands, viewContacts, viewFiles, viewAnalytics, viewRatecard, viewHealth, viewSettings, viewActive, viewManychat };

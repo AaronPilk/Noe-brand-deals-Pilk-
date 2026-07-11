@@ -1,0 +1,136 @@
+{
+  "note": "ManyChat Audit tab — 13 relevant commercial DM conversations from the Instagram DM audit (Pass 2b/2d, 2026-07-10). Backup tabs ignored. The audit's 'Cognexia' suspicious solicitation mentioned in planning is NOT present in the live workbook; nothing was fabricated.",
+  "syncedAt": "2026-07-10",
+  "records": [
+    {
+      "id": "MC-0001", "ig": "higgsfield.ai", "brand": "Higgsfield AI", "contact": "Abylay (Lead of Partnerships)",
+      "dates": "First 29 Jun 2026; latest 10 Jul 2026", "firstDm": "2026-06-29", "latestDm": "2026-07-10",
+      "link": "https://app.manychat.com/fb4032537/chat/2038834106",
+      "summary": "Direct outreach from Higgsfield partnerships lead re: \"Higgsfield Claude MCP campaign\", asked for rates. Noe replied he already works with Higgsfield; brand then asked which manager he works with.",
+      "offer": "Sponsored content (rates requested)", "deliverables": "TBD (Claude MCP campaign content)", "rights": "TBD",
+      "emailMatch": "YES (enrich 0047)", "linkedDealId": "NV-DEAL-0047",
+      "action": "ENRICH existing. Verify direct-brand vs agency (Heek/BDSJ) route. No double-count.",
+      "draftId": "NV-REPLY-0074", "classification": "Existing Deal Enriched", "channelConflict": true, "noeResponded": true
+    },
+    {
+      "id": "MC-0002", "ig": "heyitsriyaa.ai", "brand": "Undisclosed AI/tech brand (via Riya creator community)", "contact": "Riya",
+      "dates": "10 Jul 2026", "firstDm": "2026-07-10", "latestDm": "2026-07-10",
+      "link": "https://app.manychat.com/fb4032537/chat/1817657876",
+      "summary": "Intermediary: says she reps a community of 100+ AI/tech creators; an unnamed AI/tech brand wants promo content on Noe's page. Asked for commercials + media kit.",
+      "offer": "Sponsored content (brand undisclosed)", "deliverables": "TBD", "rights": "TBD",
+      "emailMatch": "UNCERTAIN", "linkedDealId": null,
+      "action": "INTERMEDIARY / UNDISCLOSED BRAND - MANUAL REVIEW. No pipeline ID or value until brand + authorization confirmed. Request brand name, full scope, budget, rights, and proof of representation.",
+      "draftId": "RD-MC-0002", "classification": "Needs Manual Review", "channelConflict": false, "noeResponded": false
+    },
+    {
+      "id": "MC-0003", "ig": "ultrahumanhq", "brand": "Ultrahuman", "contact": "Gaurav",
+      "dates": "10 Jul 2026", "firstDm": "2026-07-10", "latestDm": "2026-07-10",
+      "link": "https://app.manychat.com/fb4032537/chat/710174730",
+      "summary": "Ultrahuman (smart-ring brand) reaching out to select creators for a collab around the Ultrahuman Ring PRO. Asked for Noe's email to send details.",
+      "offer": "Sponsored content + likely gifted product (Ring PRO)", "deliverables": "TBD", "rights": "TBD",
+      "emailMatch": "NO (new)", "linkedDealId": "NV-DEAL-0066",
+      "action": "NEW. Move to email; request brief + budget. 3-post organic min.",
+      "draftId": "NV-REPLY-0066", "classification": "New Deal", "channelConflict": false, "noeResponded": false
+    },
+    {
+      "id": "MC-0004", "ig": "magicfitai", "brand": "Magicfit", "contact": "(unnamed rep)",
+      "dates": "9 Jul 2026", "firstDm": "2026-07-09", "latestDm": "2026-07-09",
+      "link": "https://app.manychat.com/fb4032537/chat/45024010",
+      "summary": "Just wrapped first creator round; offering a few remaining spots: paid upfront + 12 months commissions after a post.",
+      "offer": "Paid post + 12-mo affiliate commission", "deliverables": "1 post (implied)", "rights": "TBD",
+      "emailMatch": "NO (new)", "linkedDealId": "NV-DEAL-0067",
+      "action": "NEW. Clarify upfront fee; affiliate separate from post fee.",
+      "draftId": "NV-REPLY-0067", "classification": "New Deal", "channelConflict": false, "noeResponded": false
+    },
+    {
+      "id": "MC-0005", "ig": "n71.ai", "brand": "N71", "contact": "(unnamed rep)",
+      "dates": "8 Jul 2026", "firstDm": "2026-07-08", "latestDm": "2026-07-08",
+      "link": "https://app.manychat.com/fb4032537/chat/292552370",
+      "summary": "Tech startup wants a sponsored video; asked for Noe's price list.",
+      "offer": "Sponsored video", "deliverables": "1 video (implied)", "rights": "TBD",
+      "emailMatch": "NO (new)", "linkedDealId": "NV-DEAL-0068",
+      "action": "NEW. Send 3-post package; 3000 base min.",
+      "draftId": "NV-REPLY-0068", "classification": "New Deal", "channelConflict": false, "noeResponded": false
+    },
+    {
+      "id": "MC-0006", "ig": "mightyjoyagency", "brand": "Mighty Joy (talent/creator management agency)", "contact": "Thomas",
+      "dates": "8 Jul 2026", "firstDm": "2026-07-08", "latestDm": "2026-07-08",
+      "link": "https://app.manychat.com/fb4032537/chat/449996782",
+      "summary": "Creator-management agency; works with tech/business/AI creators to land brand deals + grow business side. Wants Noe on their roster.",
+      "offer": "Representation / management (rev-share TBD)", "deliverables": "N/A", "rights": "N/A",
+      "emailMatch": "NO (new)", "linkedDealId": "NV-DEAL-0069",
+      "action": "NEW (representation). Evaluate terms; no media package pricing.",
+      "draftId": "NV-REPLY-0069", "classification": "New Deal", "channelConflict": false, "noeResponded": false
+    },
+    {
+      "id": "MC-0007", "ig": null, "brand": "(independent — Nick Pratezina)", "contact": "Nick Pratezina",
+      "dates": "9 Jul 2026", "firstDm": "2026-07-09", "latestDm": "2026-07-09",
+      "link": null,
+      "summary": "Early feeler: likes the AI/Claude content; asked whether Noe ever partners with companies in the AI space or keeps things independent.",
+      "offer": "Undefined (partnership feeler)", "deliverables": "TBD", "rights": "TBD",
+      "emailMatch": "NO (new)", "linkedDealId": "NV-DEAL-0070",
+      "action": "NEW (low). Qualify before quoting.",
+      "draftId": "NV-REPLY-0070", "classification": "New Deal", "channelConflict": false, "noeResponded": false
+    },
+    {
+      "id": "MC-0008", "ig": "smartugc.ai", "brand": "SmartUGC", "contact": "(unnamed rep)",
+      "dates": "7 Jul 2026", "firstDm": "2026-07-07", "latestDm": "2026-07-07",
+      "link": "https://app.manychat.com/fb4032537/chat/1295366758",
+      "summary": "UGC ad tool (AI actors). Taking on a few affiliates: free access + recurring cut per subscription.",
+      "offer": "Affiliate (free access + recurring rev-share)", "deliverables": "Promo content (implied)", "rights": "TBD",
+      "emailMatch": "NO (new)", "linkedDealId": "NV-DEAL-0071",
+      "action": "NEW (affiliate). No 3-post package; content priced separately.",
+      "draftId": "NV-REPLY-0071", "classification": "New Deal", "channelConflict": false, "noeResponded": false
+    },
+    {
+      "id": "MC-0009", "ig": "felipe.sf.insider", "brand": "Houston", "contact": "Felipe Salinas (Co-founder & CEO)",
+      "dates": "Latest 10 Jul 2026", "firstDm": null, "latestDm": "2026-07-10",
+      "link": "https://app.manychat.com/fb4032537/chat/1958295172",
+      "summary": "Same Felipe/Houston as email deal. Inviting Noe to a private 45-min session (Jul 16 or Jul 21) for early access to Houston (AI-agent desktop app); if he likes it, wants to discuss a PAID collab.",
+      "offer": "Product trial + potential paid collab", "deliverables": "TBD", "rights": "TBD",
+      "emailMatch": "YES (enrich 0019)", "linkedDealId": "NV-DEAL-0019",
+      "action": "ENRICH existing (exact match). No double-count.",
+      "draftId": "NV-REPLY-0075", "classification": "Existing Deal Enriched", "channelConflict": false, "noeResponded": false
+    },
+    {
+      "id": "MC-0010", "ig": "i_aaliya_ebad_", "brand": "Dreamina (via JEEVMEDIA agency)", "contact": "Aaliya Ebad",
+      "dates": "2 Jul 2026", "firstDm": "2026-07-02", "latestDm": "2026-07-02",
+      "link": "https://app.manychat.com/fb4032537/chat/1208980171",
+      "summary": "JEEVMEDIA exploring influencer partnership for a Dreamina campaign. Requested commercials for: 1 IG Reel + link-in-bio/DM automation + 90-day ad usage rights. Asked if Noe worked with Dreamina or Higgsfield before.",
+      "offer": "Sponsored Reel + DM automation + 90-day ad usage rights", "deliverables": "1 IG Reel + link-in-bio/DM automation", "rights": "90-day ad usage rights (PRICE SEPARATELY)",
+      "emailMatch": "POSSIBLE DUPLICATE", "linkedDealId": null, "relatedDealId": "NV-DEAL-0028",
+      "action": "POSSIBLE DUPLICATE / AGENCY AUTHORIZATION REQUIRES MANUAL REVIEW. Related to Dreamina (NV-DEAL-0028) + sibling MC-0011. No new ID, no added value.",
+      "draftId": "RD-MC-0010", "classification": "Possible Duplicate", "channelConflict": false, "noeResponded": false
+    },
+    {
+      "id": "MC-0011", "ig": "sitesby.bennett", "brand": "Dreamina / ByteDance (via unnamed UGC agency)", "contact": "(rep) Bennett",
+      "dates": "6 Jul 2026", "firstDm": "2026-07-06", "latestDm": "2026-07-06",
+      "link": null,
+      "summary": "UGC agency; wants 1 short-form video on Dreamina (ByteDance) at $15 CPM, up to $1000 max payout (~83k views). If it performs, more videos.",
+      "offer": "UGC video, performance-based ($15 CPM, $1000 cap)", "deliverables": "1 short-form video", "rights": "TBD",
+      "emailMatch": "POSSIBLE DUPLICATE", "linkedDealId": null, "relatedDealId": "NV-DEAL-0028",
+      "action": "POSSIBLE DUPLICATE / AGENCY AUTHORIZATION REQUIRES MANUAL REVIEW. Related to Dreamina (NV-DEAL-0028) + sibling MC-0010. No new ID, no added value.",
+      "draftId": "RD-MC-0011", "classification": "Possible Duplicate", "channelConflict": false, "noeResponded": false
+    },
+    {
+      "id": "MC-0012", "ig": "outvidai", "brand": "Outvid AI", "contact": "(unnamed rep)",
+      "dates": "2 Jul 2026", "firstDm": "2026-07-02", "latestDm": "2026-07-02",
+      "link": "https://app.manychat.com/fb4032537/chat/1795896939",
+      "summary": "AI sales-video tool; offered free access to try, framed as a feature for Noe's audience.",
+      "offer": "Free product access (no cash)", "deliverables": "TBD", "rights": "TBD",
+      "emailMatch": "NO (new)", "linkedDealId": "NV-DEAL-0072",
+      "action": "NEW (low). No guaranteed cash.",
+      "draftId": "NV-REPLY-0072", "classification": "New Deal", "channelConflict": false, "noeResponded": false
+    },
+    {
+      "id": "MC-0013", "ig": null, "brand": "(independent — \"Building stuff\")", "contact": "Building stuff",
+      "dates": "7 Jul 2026", "firstDm": "2026-07-07", "latestDm": "2026-07-07",
+      "link": null,
+      "summary": "One-line inbound: \"Paid promo?\" — asking whether Noe does paid promotions. No brand/details yet.",
+      "offer": "Undefined (paid promo inquiry)", "deliverables": "TBD", "rights": "TBD",
+      "emailMatch": "NO (new)", "linkedDealId": "NV-DEAL-0073",
+      "action": "NEW (low). Qualify.",
+      "draftId": "NV-REPLY-0073", "classification": "New Deal", "channelConflict": false, "noeResponded": false
+    }
+  ]
+}

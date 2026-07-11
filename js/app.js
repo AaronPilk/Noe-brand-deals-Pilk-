@@ -8,6 +8,7 @@ const ROUTES = [
   { path: 'negotiations', label: 'Negotiations', ico: '⇄', view: 'viewNegotiations', section: 'Work', count: () => NV.deals.filter(isActionable).length },
   { path: 'followups', label: 'Follow-Ups', ico: '↻', view: 'viewFollowups', section: 'Work', count: () => NV.followups.length },
   { path: 'responses', label: 'Responses', ico: '✉', view: 'viewResponses', section: 'Work', count: () => NV.drafts.length },
+  { path: 'manychat', label: 'ManyChat Audit', ico: '◇', view: 'viewManychat', section: 'Records', count: () => NV.manychat.records.length },
   { path: 'brands', label: 'Brands', ico: '◈', view: 'viewBrands', section: 'Records' },
   { path: 'contacts', label: 'Contacts', ico: '◉', view: 'viewContacts', section: 'Records' },
   { path: 'files', label: 'Contracts & Files', ico: '⎗', view: 'viewFiles', section: 'Records' },
@@ -90,6 +91,13 @@ const CmdK = (() => {
     { t: 'Deals needing a counter', ico: '⇄', go: () => (location.hash = '#/deals?filter=counter') },
     { t: 'View scam-risk records', ico: '⚠', go: () => (location.hash = '#/deals?filter=scam') },
     { t: 'Strategic exceptions awaiting approval', ico: '◆', go: () => (location.hash = '#/deals?filter=exception') },
+    { t: 'Show ManyChat-only deals', ico: '◇', go: () => (location.hash = '#/deals?filter=manychat') },
+    { t: 'Show email + DM matches', ico: '◇', go: () => (location.hash = '#/deals?filter=both') },
+    { t: 'Show channel conflicts', ico: '⚠', go: () => (location.hash = '#/deals?filter=conflict') },
+    { t: 'Show possible duplicates', ico: '⚠', go: () => (location.hash = '#/deals?filter=duplicate') },
+    { t: 'Open ManyChat audit', ico: '◇', go: () => (location.hash = '#/manychat') },
+    { t: 'Open DM drafts awaiting review', ico: '✉', go: () => { const first = NV.drafts.find((x) => x.channel === 'dm' && !NVStore.getDraftStatus(x.dealId)); location.hash = first ? `#/deal/${first.dealId}?tab=negotiation` : '#/responses'; } },
+    { t: 'Show unanswered commercial DMs', ico: '◇', go: () => (location.hash = '#/manychat?filter=Response Ready') },
     { t: 'Toggle dark / light mode', ico: '◐', go: toggleTheme }
   ];
 
@@ -106,15 +114,17 @@ const CmdK = (() => {
     } else {
       const nav = ROUTES.filter((r) => r.label.toLowerCase().includes(ql)).map((r) => ({ t: r.label, ico: r.ico, section: 'Go to', go: () => (location.hash = '#/' + r.path) }));
       const acts = ACTIONS.filter((a) => a.t.toLowerCase().includes(ql)).map((a) => ({ ...a, section: 'Actions' }));
-      const deals = NV.deals.filter((d) => (d.brand + ' ' + d.deal_id + ' ' + d.product + ' ' + d.agency + ' ' + d.contact_email + ' ' + d.ai_category).toLowerCase().includes(ql))
+      const deals = NV.deals.filter((d) => (d.brand + ' ' + d.deal_id + ' ' + d.product + ' ' + d.agency + ' ' + d.contact_email + ' ' + d.ai_category + ' ' + d.commercial_structure + ' ' + (d.source_channel === 'manychat' ? 'manychat dm instagram' : '') + ' ' + d.manychat_ids.map((m) => { const r = NV.manychat.records.find((x) => x.id === m); return r ? m + ' ' + (r.ig || '') + ' ' + r.contact : m; }).join(' ')).toLowerCase().includes(ql))
         .slice(0, 8).map((d) => ({ t: d.brand, sub: `${d.deal_id} · ${d.grade} · ${fmt$(d.prob_weighted_usd)}`, ico: '▤', section: 'Deals', go: () => (location.hash = `#/deal/${d.deal_id}`) }));
+      const mcs = NV.manychat.records.filter((m) => (m.id + ' ' + (m.ig || '') + ' ' + m.brand + ' ' + m.contact + ' ' + m.classification).toLowerCase().includes(ql))
+        .slice(0, 4).map((m) => ({ t: `${m.id} — ${m.brand}`, sub: m.ig ? '@' + m.ig : m.classification, ico: '◇', section: 'ManyChat audit', go: () => (location.hash = m.linkedDealId ? `#/deal/${m.linkedDealId}` : '#/manychat') }));
       const drafts = NV.drafts.filter((x) => (x.brand + ' ' + x.id + ' ' + x.subject).toLowerCase().includes(ql))
         .slice(0, 4).map((x) => ({ t: x.subject, sub: x.id, ico: '✉', section: 'Drafts', go: () => (location.hash = `#/deal/${x.dealId}?tab=negotiation`) }));
       const brands = NV.research.filter((r) => (r.brand + ' ' + r.domain + ' ' + r.competitors).toLowerCase().includes(ql))
         .slice(0, 4).map((r) => ({ t: r.brand + ' — research', sub: r.domain, ico: '◈', section: 'Brand research', go: () => (location.hash = `#/deal/${r.dealId}?tab=research`) }));
       const actives = (NV.active?.deals || []).filter((a) => (a.brand + ' ' + a.stage + ' ' + a.notes).toLowerCase().includes(ql))
         .slice(0, 4).map((a) => ({ t: `${a.brand} (Round ${a.round})`, sub: `${a.stage}${a.amount ? ' · $' + a.amount.toLocaleString() : ''}`, ico: '●', section: 'Active deals', go: () => (location.hash = '#/active') }));
-      items = [...nav, ...acts, ...actives, ...deals, ...drafts, ...brands];
+      items = [...nav, ...acts, ...actives, ...deals, ...mcs, ...drafts, ...brands];
     }
     sel = 0;
     render();
@@ -163,7 +173,22 @@ document.getElementById('collapse-toggle').addEventListener('click', () => {
   sb.classList.toggle('collapsed');
   NVStore.setSidebar(sb.classList.contains('collapsed'));
 });
-document.getElementById('mobile-menu').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+/* Mobile drawer: backdrop + close on outside tap */
+const sidebarEl = document.getElementById('sidebar');
+function setDrawer(open) {
+  sidebarEl.classList.toggle('open', open);
+  let bd = document.getElementById('sidebar-backdrop');
+  if (open && !bd) {
+    bd = document.createElement('div');
+    bd.id = 'sidebar-backdrop';
+    bd.className = 'sidebar-backdrop';
+    bd.addEventListener('click', () => setDrawer(false));
+    document.body.appendChild(bd);
+  } else if (!open && bd) bd.remove();
+}
+document.getElementById('mobile-menu').addEventListener('click', () => setDrawer(!sidebarEl.classList.contains('open')));
+document.getElementById('nav').addEventListener('click', () => setDrawer(false));
+window.addEventListener('hashchange', () => setDrawer(false));
 
 /* ---------- boot ---------- */
 (function boot() {

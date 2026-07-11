@@ -366,15 +366,41 @@ textarea { resize: vertical; min-height: 74px; }
   .grid.cols-3 { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 760px) {
-  .sidebar { position: fixed; z-index: 50; height: 100%; transform: translateX(-100%); transition: transform .22s var(--ease); }
+  .sidebar { position: fixed; z-index: 50; height: 100%; height: 100dvh; transform: translateX(-100%); transition: transform .22s var(--ease); }
   .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
-  .mobile-menu { display: block; }
-  .searchbar { min-width: 0; }
+  .sidebar-backdrop { position: fixed; inset: 0; z-index: 49; background: rgba(0,0,0,.3); animation: fade .18s var(--ease); }
+  .mobile-menu { display: block; padding: 8px 10px; }
+  .searchbar { min-width: 0; padding: 8px 10px; }
   .search-hint { display: none; }
+  .sync-pill { display: none; }
   .grid.cols-2, .grid.cols-3, .grid.cols-4 { grid-template-columns: 1fr; }
-  .workspace { padding: 16px 14px 48px; }
+  .workspace { padding: 16px 14px 64px; }
   .kv-grid { grid-template-columns: 1fr; gap: 2px 0; }
   .kv-grid .k { margin-top: 8px; }
+  .page-title { font-size: 22px; }
+  .deal-header { flex-direction: row; gap: 12px; }
+  .avatar { width: 44px; height: 44px; font-size: 16px; border-radius: 12px; }
+  .deal-title { font-size: 19px; }
+  /* touch targets */
+  .btn { padding: 10px 16px; min-height: 42px; }
+  .btn.sm { padding: 8px 12px; min-height: 38px; }
+  .nav-item { padding: 11px 10px; font-size: 14.5px; }
+  select, input[type="text"], textarea { font-size: 16px; } /* prevents iOS zoom-on-focus */
+  .filters select, .filters input[type="text"] { flex: 1 1 44%; font-size: 15px; padding: 9px 10px; }
+  .segmented button { padding: 9px 13px; }
+  .tbl th, .tbl td { padding: 10px 10px; }
+  .tbl-wrap { -webkit-overflow-scrolling: touch; }
+  .board-col { min-width: 82vw; width: 82vw; }
+  .draft-body { max-height: 50vh; }
+  .draft-actions .btn { flex: 1 1 auto; justify-content: center; }
+  .cmdk-overlay { padding-top: 6vh; }
+  .cmdk-results { max-height: 55vh; }
+  .bar-row { grid-template-columns: 110px 1fr 64px; }
+  .list-item { padding: 12px 4px; }
+  .topbar { padding: 0 12px; }
+}
+@media (max-width: 760px) and (display-mode: standalone) {
+  .topbar { padding-top: env(safe-area-inset-top); height: calc(54px + env(safe-area-inset-top)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

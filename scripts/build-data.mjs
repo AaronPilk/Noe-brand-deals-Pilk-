@@ -48,19 +48,57 @@ const deals = rows.slice(1).map((r) => {
   return d;
 });
 
-// Validation — fail loudly rather than silently ship bad data
+// ---------- ManyChat audit (loaded early: needed for channel derivation) ----------
+const manychat = JSON.parse(readFileSync(src('manychat.json'), 'utf8'));
+const mcByDeal = {};
+for (const mc of manychat.records) {
+  if (mc.linkedDealId) (mcByDeal[mc.linkedDealId] = mcByDeal[mc.linkedDealId] || []).push(mc.id);
+  if (mc.relatedDealId) (mcByDeal[mc.relatedDealId] = mcByDeal[mc.relatedDealId] || []).push(mc.id);
+}
+
+// Source-channel derivation: the sheet stores 'Instagram DM via ManyChat' in the
+// gmail_thread_url column for DM-only deals; email deals have a Gmail URL.
+// Email deals enriched by a linked ManyChat conversation are 'both'.
+for (const d of deals) {
+  const dm = d.gmail_thread_url === 'Instagram DM via ManyChat';
+  const email = /^https?:\/\//.test(d.gmail_thread_url || '');
+  // Only LINKED conversations count as enrichment; 'related' possible-duplicate
+  // approaches (e.g. Dreamina intermediaries) surface as context, not as a channel.
+  const enriched = manychat.records.some((m) => m.linkedDealId === d.deal_id);
+  d.source_channel = dm ? 'manychat' : email && enriched ? 'both' : email ? 'email' : 'unknown';
+  d.manychat_ids = mcByDeal[d.deal_id] || [];
+  if (dm) d.gmail_thread_url = ''; // not a real URL; channel now captured in source_channel
+}
+
+// Validation — fail loudly on structural problems, warn visibly on soft issues
 const ids = deals.map((d) => d.deal_id);
 const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
 const errors = [];
-if (deals.length !== 65) errors.push(`Expected 65 deals, got ${deals.length}`);
+const warnings = [];
+if (deals.length !== 73) errors.push(`Expected 73 deals, got ${deals.length}`);
+const maxId = ids.map((i) => +i.slice(-4)).sort((a, b) => b - a)[0];
+if (maxId !== 73) errors.push(`Max deal id NV-DEAL-00${maxId}, expected NV-DEAL-0073`);
 if (dupes.length) errors.push(`Duplicate deal ids: ${dupes.join(', ')}`);
 for (const d of deals) {
   if (!/^NV-DEAL-\d{4}$/.test(d.deal_id)) errors.push(`Bad id: ${d.deal_id}`);
-  if (d.close_probability > 1) errors.push(`${d.deal_id}: probability > 1`);
-  const pw = Math.round(d.likely_close_usd * d.close_probability);
-  if (Math.abs(pw - d.prob_weighted_usd) > 1) errors.push(`${d.deal_id}: prob_weighted mismatch (${pw} vs ${d.prob_weighted_usd})`);
+  if (d.close_probability != null && d.close_probability > 1) errors.push(`${d.deal_id}: probability > 1`);
+  if (d.likely_close_usd != null && d.close_probability != null && d.prob_weighted_usd != null) {
+    const pw = Math.round(d.likely_close_usd * d.close_probability);
+    if (Math.abs(pw - d.prob_weighted_usd) > 1) errors.push(`${d.deal_id}: prob_weighted mismatch (${pw} vs ${d.prob_weighted_usd})`);
+  }
+  if (d.source_channel === 'unknown') warnings.push(`${d.deal_id}: no email thread and no ManyChat link — source unknown`);
+  if (d.source_channel === 'manychat' && d.prob_weighted_usd == null) { /* expected: DM deals not yet valued */ }
+}
+// Dedupe guards for enriched records — one deal, one valuation
+for (const id of ['NV-DEAL-0019', 'NV-DEAL-0047']) {
+  if (ids.filter((x) => x === id).length !== 1) errors.push(`${id} must appear exactly once (enriched, not duplicated)`);
+}
+// Dreamina intermediaries must not carry pipeline ids/value
+for (const mc of manychat.records) {
+  if (mc.classification === 'Possible Duplicate' && mc.linkedDealId) errors.push(`${mc.id}: possible duplicate must not create a pipeline id`);
 }
 if (errors.length) { console.error('VALIDATION FAILED:\n' + errors.join('\n')); process.exit(1); }
+if (warnings.length) console.warn('WARNINGS (shown in Data Health):\n' + warnings.join('\n'));
 
 // ---------- Drafts (templates + params -> full bodies, verbatim vs sheet) ----------
 const cfg = JSON.parse(readFileSync(src('drafts-config.json'), 'utf8'));
@@ -78,18 +116,24 @@ const drafts = cfg.drafts.map((p) => {
     body,
     doNotSendUntil: cfg.doNotSendUntil,
     templateKey: p.template,
+    channel: 'email',
     exception: p.template === 'exception'
   };
-});
-if (drafts.length !== 62) { console.error(`Expected 62 drafts, got ${drafts.length}`); process.exit(1); }
+}).concat((cfg.rawDrafts || []).map((r) => ({
+  id: r.id, dealId: r.dealId, brand: byId[r.dealId] ? byId[r.dealId].brand : '',
+  recipient: r.recipient, responseType: r.responseType, subject: r.subject,
+  body: r.body, doNotSendUntil: r.doNotSendUntil, templateKey: null,
+  channel: r.channel, exception: false
+})));
+if (drafts.length !== 72) { console.error(`Expected 72 drafts (62 email + 10 DM), got ${drafts.length}`); process.exit(1); }
 
 // ---------- Follow-ups (join with deals) ----------
 const fu = JSON.parse(readFileSync(src('followups.json'), 'utf8'));
 const followups = fu.queue.map((q) => {
   const d = byId[q.dealId];
-  return { dealId: q.dealId, brand: d.brand, priority: d.priority, grade: d.grade, days: d.days_since_contact, timing: q.timing, action: d.recommended_action, gmail: d.gmail_thread_url };
+  return { dealId: q.dealId, brand: d.brand, priority: d.priority, grade: d.grade, days: d.days_since_contact, timing: q.timing, action: d.recommended_action, gmail: d.gmail_thread_url, channel: d.source_channel, manychatIds: d.manychat_ids };
 });
-if (followups.length !== 57) { console.error(`Expected 57 follow-ups, got ${followups.length}`); process.exit(1); }
+if (followups.length !== 65) { console.error(`Expected 65 follow-ups (57 email + 8 DM), got ${followups.length}`); process.exit(1); }
 
 const research = JSON.parse(readFileSync(src('research.json'), 'utf8'));
 const dashboard = JSON.parse(readFileSync(src('dashboard.json'), 'utf8'));
@@ -111,12 +155,22 @@ const NV_DATA = {
     researchCount: research.brands.length,
     activeDealCount: active.deals.length,
     activeSyncedAt: active.syncedAt,
-    validation: 'passed'
+    manychatCount: manychat.records.length,
+    manychatSyncedAt: manychat.syncedAt,
+    channels: {
+      email: deals.filter((d) => d.source_channel === 'email').length,
+      manychat: deals.filter((d) => d.source_channel === 'manychat').length,
+      both: deals.filter((d) => d.source_channel === 'both').length
+    },
+    backupTabsIgnored: true,
+    validation: 'passed',
+    warnings
   },
   deals, drafts, followups,
   research: research.brands,
   dashboard, ratecard,
-  active
+  active,
+  manychat
 };
 
 writeFileSync(join(root, 'data', 'nv-data.js'), '// GENERATED by scripts/build-data.mjs — do not edit by hand.\nwindow.NV_DATA = ' + JSON.stringify(NV_DATA, null, 1) + ';\n');
