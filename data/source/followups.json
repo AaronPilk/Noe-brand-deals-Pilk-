@@ -65,6 +65,11 @@
     { "dealId": "NV-DEAL-0070", "timing": "Within 1 week" },
     { "dealId": "NV-DEAL-0071", "timing": "Within 1 week" },
     { "dealId": "NV-DEAL-0072", "timing": "Within 1 week" },
-    { "dealId": "NV-DEAL-0073", "timing": "Within 1 week" }
+    { "dealId": "NV-DEAL-0073", "timing": "Within 1 week" },
+    { "dealId": "NV-DEAL-0074", "timing": "Within 24-48 hours (fresh; act now)" },
+    { "dealId": "NV-DEAL-0075", "timing": "Within 24-48 hours (fresh; act now)" },
+    { "dealId": "NV-DEAL-0076", "timing": "Within 24-48 hours (fresh; act now)" },
+    { "dealId": "NV-DEAL-0077", "timing": "Within 24-48 hours (fresh; act now)" },
+    { "dealId": "NV-DEAL-0078", "timing": "Within 24-48 hours (fresh; act now)" }
   ]
 }
