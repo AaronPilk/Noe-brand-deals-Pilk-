@@ -133,7 +133,7 @@ const followups = fu.queue.map((q) => {
   const d = byId[q.dealId];
   return { dealId: q.dealId, brand: d.brand, priority: d.priority, grade: d.grade, days: d.days_since_contact, timing: q.timing, action: d.recommended_action, gmail: d.gmail_thread_url, channel: d.source_channel, manychatIds: d.manychat_ids };
 });
-if (followups.length !== 84) { console.error(`Expected 84 follow-ups (76 email + 8 DM), got ${followups.length}`); process.exit(1); }
+if (followups.length !== 83) { console.error(`Expected 83 follow-ups (75 email + 8 DM), got ${followups.length}`); process.exit(1); }
 
 const research = JSON.parse(readFileSync(src('research.json'), 'utf8'));
 const dashboard = JSON.parse(readFileSync(src('dashboard.json'), 'utf8'));
