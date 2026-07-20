@@ -75,9 +75,9 @@ const ids = deals.map((d) => d.deal_id);
 const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
 const errors = [];
 const warnings = [];
-if (deals.length !== 80) errors.push(`Expected 80 deals, got ${deals.length}`);
+if (deals.length !== 92) errors.push(`Expected 92 deals, got ${deals.length}`);
 const maxId = ids.map((i) => +i.slice(-4)).sort((a, b) => b - a)[0];
-if (maxId !== 80) errors.push(`Max deal id NV-DEAL-00${maxId}, expected NV-DEAL-0080`);
+if (maxId !== 92) errors.push(`Max deal id NV-DEAL-00${maxId}, expected NV-DEAL-0092`);
 if (dupes.length) errors.push(`Duplicate deal ids: ${dupes.join(', ')}`);
 for (const d of deals) {
   if (!/^NV-DEAL-\d{4}$/.test(d.deal_id)) errors.push(`Bad id: ${d.deal_id}`);
@@ -125,7 +125,7 @@ const drafts = cfg.drafts.map((p) => {
   body: r.body, doNotSendUntil: r.doNotSendUntil, templateKey: null,
   channel: r.channel, exception: false
 })));
-if (drafts.length !== 78) { console.error(`Expected 78 drafts (68 email + 10 DM), got ${drafts.length}`); process.exit(1); }
+if (drafts.length !== 90) { console.error(`Expected 90 drafts (80 email + 10 DM), got ${drafts.length}`); process.exit(1); }
 
 // ---------- Follow-ups (join with deals) ----------
 const fu = JSON.parse(readFileSync(src('followups.json'), 'utf8'));
@@ -133,7 +133,7 @@ const followups = fu.queue.map((q) => {
   const d = byId[q.dealId];
   return { dealId: q.dealId, brand: d.brand, priority: d.priority, grade: d.grade, days: d.days_since_contact, timing: q.timing, action: d.recommended_action, gmail: d.gmail_thread_url, channel: d.source_channel, manychatIds: d.manychat_ids };
 });
-if (followups.length !== 71) { console.error(`Expected 71 follow-ups (63 email + 8 DM), got ${followups.length}`); process.exit(1); }
+if (followups.length !== 84) { console.error(`Expected 84 follow-ups (76 email + 8 DM), got ${followups.length}`); process.exit(1); }
 
 const research = JSON.parse(readFileSync(src('research.json'), 'utf8'));
 const dashboard = JSON.parse(readFileSync(src('dashboard.json'), 'utf8'));
