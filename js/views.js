@@ -1062,11 +1062,18 @@ function viewFollowups() {
 function viewResponses() {
   const groups = {};
   NV.drafts.forEach((x) => { (groups[x.responseType] = groups[x.responseType] || []).push(x); });
+  const pendingEmail = NV.drafts.filter((x) => x.channel === 'email' && !NVStore.getDraftStatus(x.dealId) && dealById(x.dealId) && isViable(dealById(x.dealId)) && !/thesocialcat/.test(dealById(x.dealId).contact_email || ''));
   return {
     title: 'Responses',
     html: `
       <h1 class="page-title">Responses</h1>
       <div class="page-sub">${NV.drafts.length} prepared drafts in Aaron's voice — all on HOLD. Approve, copy into Gmail, and mark sent from each deal's negotiation tab.</div>
+      ${pendingEmail.length ? `
+      <div class="card" style="margin-bottom:16px;border-left:3px solid var(--blue)">
+        <h3>Batch send-off</h3>
+        <div style="font-size:13px;color:var(--text-2);margin-bottom:10px">After you send the staged Gmail replies, mark the whole batch here in one click: ${pendingEmail.length} pending email drafts flip to “Sent manually” and their deals move to In Negotiation. Only do this once the emails are actually out.</div>
+        <button class="btn primary" id="bulk-sent">Mark ${pendingEmail.length} email replies as sent</button>
+      </div>` : ''}
       ${Object.entries(groups).map(([type, list]) => `
         <div class="section-title">${esc(type)} <span class="hint">${list.length}</span></div>
         <div class="card" style="padding:6px 16px">
@@ -1082,7 +1089,19 @@ function viewResponses() {
               ${x.exception ? '<span class="chip purple">Exception</span>' : ''}
               ${st ? `<span class="chip ${st === 'Approved internally' ? 'green' : 'blue'}">${esc(st)}</span>` : '<span class="chip amber">Hold</span>'}
             </div>`; }).join('')}
-        </div>`).join('')}`
+        </div>`).join('')}`,
+    mount() {
+      document.getElementById('bulk-sent')?.addEventListener('click', () => {
+        const list = NV.drafts.filter((x) => x.channel === 'email' && !NVStore.getDraftStatus(x.dealId) && dealById(x.dealId) && isViable(dealById(x.dealId)) && !/thesocialcat/.test(dealById(x.dealId).contact_email || ''));
+        if (!confirm(`Mark ${list.length} email replies as sent and move their deals to In Negotiation? Do this only after the emails have actually gone out.`)) return;
+        for (const x of list) {
+          NVStore.setDraftStatus(x.dealId, 'Sent manually');
+          NVStore.setStage(x.dealId, 'In Negotiation', 'Batch reply run');
+        }
+        toast(`${list.length} replies marked sent`);
+        renderRoute();
+      });
+    }
   };
 }
 
