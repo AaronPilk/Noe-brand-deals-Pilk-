@@ -43,7 +43,8 @@
     "minPerPost": 1000,
     "minPosts": 3,
     "minPackage": 3000,
-    "statement": "Organic posting floor: $1,000/post minimum, 3-post minimum campaign, $3,000 minimum organic package. Paid usage, licensing, whitelisting, exclusivity and additional rights are priced separately and never bundled into the base fee. AI training / voice / likeness / synthetic-media rights are never bundled into a sponsorship fee — separate legal + commercial negotiation, baseline 3-10x content fee, typically declined."
+    "singleVideoFloor": 2000,
+    "statement": "Organic posting floor: $1,000/post minimum, 3-post minimum campaign, $3,000 minimum organic package. Single-video floor (set by Aaron 2026-07-21): any one-video deal, including unlisted ad creative and UGC one-offs, never closes under $2,000 all-in (production plus license combined). Paid usage, licensing, whitelisting, exclusivity and additional rights are priced separately and never bundled into the base fee. AI training / voice / likeness / synthetic-media rights are never bundled into a sponsorship fee — separate legal + commercial negotiation, baseline 3-10x content fee, typically declined."
   },
   "bestLongTerm": ["NV-DEAL-0019", "NV-DEAL-0047"],
   "igEvidence": {

@@ -793,6 +793,7 @@ ${res ? `${res.company}\nDomain: ${res.domain} (${res.domainLegitimacy})\nReputa
 
 ## Hard rules
 - $1,000/post minimum, 3-post minimum, $3,000 minimum organic package.
+- Single-video deals (ad creative, UGC one-offs, unlisted formats): never close under $2,000 all in, production plus license combined.
 - Paid usage, licensing, whitelisting, exclusivity: separate line items, never bundled.
 - No perpetual usage under a standard fee. AI likeness/voice/training rights: separate legal + commercial negotiation, 3–10x baseline, usually declined.
 - Anything below the floor must be labeled EXCEPTION REQUIRES AARON APPROVAL.
@@ -1233,7 +1234,7 @@ function viewRatecard() {
     html: `
       <h1 class="page-title">Rate Card</h1>
       <div class="page-sub">Basis: 104K IG followers, ~12.4K median Reel views, B2B AI-marketing niche premium. Editable estimates in USD.</div>
-      <div class="banner blue"><span>▦</span><div><b>Floor policy (v3.0):</b> $1,000 minimum internal value per post · three-post minimum · $3,000 minimum organic package. Everything below is a component price — packages never quote under the floor.</div></div>
+      <div class="banner blue"><span>▦</span><div><b>Floor policy (v3.0):</b> $1,000 minimum internal value per post · three-post minimum · $3,000 minimum organic package · <b>$2,000 all-in floor on any single-video deal</b> (production + license combined; set by Aaron Jul 21). Everything below is a component price — packages never quote under the floors.</div></div>
       <div class="section-title">Deliverables</div>
       ${tbl(rc.deliverables)}
       <div class="section-title">Usage & rights <span class="hint">applied on top of content fees — never bundled</span></div>
