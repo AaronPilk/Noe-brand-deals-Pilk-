@@ -75,9 +75,10 @@ const ids = deals.map((d) => d.deal_id);
 const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
 const errors = [];
 const warnings = [];
-if (deals.length !== 92) errors.push(`Expected 92 deals, got ${deals.length}`);
+// 2026-07-28: 92 audited deals + 20 added by the Gmail sent-mail sweep (NV-DEAL-0093..0112)
+if (deals.length !== 112) errors.push(`Expected 112 deals, got ${deals.length}`);
 const maxId = ids.map((i) => +i.slice(-4)).sort((a, b) => b - a)[0];
-if (maxId !== 92) errors.push(`Max deal id NV-DEAL-00${maxId}, expected NV-DEAL-0092`);
+if (maxId !== 112) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0112`);
 if (dupes.length) errors.push(`Duplicate deal ids: ${dupes.join(', ')}`);
 for (const d of deals) {
   if (!/^NV-DEAL-\d{4}$/.test(d.deal_id)) errors.push(`Bad id: ${d.deal_id}`);
