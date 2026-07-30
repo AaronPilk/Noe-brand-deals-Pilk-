@@ -79,9 +79,13 @@ const warnings = [];
 // 2026-07-28 pm: +2 from negotiation sync — Tripo3D (0113), Luma.ai via Kudos Narratives (0114)
 // 2026-07-28 pm full sweep: +4 — VidMuse via Superlinear (0115), VidMuse via Fancy Media (0116),
 //   VidMuse via SSG (0117), Higgsfield via Heek Entertainment (0118)
-if (deals.length !== 118) errors.push(`Expected 118 deals, got ${deals.length}`);
+// 2026-07-30: +1 from the Jul 30 Gmail sweep — Arcads existing-partner batch (0119). Deals-closing
+//   label reconciled (Similarweb/VidMuse-Superlinear/FanBase -> Closing - Paperwork; Betatron call
+//   booked; Virlo held pending acceptance verification; Voiskey + Higgsfield/Heek reactivated as
+//   needs-reply). Meet August (0061) + TicNote (0043) closed-lost. Followups +2 (0108, 0119) -> 90.
+if (deals.length !== 119) errors.push(`Expected 119 deals, got ${deals.length}`);
 const maxId = ids.map((i) => +i.slice(-4)).sort((a, b) => b - a)[0];
-if (maxId !== 118) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0118`);
+if (maxId !== 119) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0119`);
 if (dupes.length) errors.push(`Duplicate deal ids: ${dupes.join(', ')}`);
 for (const d of deals) {
   if (!/^NV-DEAL-\d{4}$/.test(d.deal_id)) errors.push(`Bad id: ${d.deal_id}`);
@@ -226,7 +230,7 @@ const followups = fu.queue.map((q) => {
   const d = byId[q.dealId];
   return { dealId: q.dealId, brand: d.brand, priority: d.priority, grade: d.grade, days: d.days_since_contact, timing: q.timing, action: d.recommended_action, gmail: d.gmail_thread_url, channel: d.source_channel, manychatIds: d.manychat_ids };
 });
-if (followups.length !== 88) { console.error(`Expected 88 follow-ups (80 email + 8 DM), got ${followups.length}`); process.exit(1); }
+if (followups.length !== 90) { console.error(`Expected 90 follow-ups, got ${followups.length}`); process.exit(1); }
 
 const research = JSON.parse(readFileSync(src('research.json'), 'utf8'));
 const dashboard = JSON.parse(readFileSync(src('dashboard.json'), 'utf8'));
