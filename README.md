@@ -27,21 +27,25 @@ Private, Apple-style CRM and negotiation command center for Noe Varner's brand p
 
 ## Data model — two layers, never mixed
 
-- **Source (read-only):** the audited Google Sheet → `data/source/` → compiled to `data/nv-data.js` by `scripts/build-data.mjs` (validates 65 unique IDs, probability math, draft counts; fails loudly).
-- **Operational (Aaron's):** stages, notes, approvals, brand replies, voice feedback → browser localStorage with full before/after activity history. Export/import from Settings. Original audit facts are never overwritten.
+- **Source of truth:** `data/source/ui-export.csv` in **this repo** → compiled to `data/nv-data.js` by `scripts/build-data.mjs` (validates unique IDs, probability math, draft counts; fails loudly). The old Google Sheet is deprecated — kept only as a historical backup. `scripts/sync.mjs` (which pulled from the sheet) is disabled so it can't overwrite current data with a stale copy.
+- **Operational (Aaron's):** stages, notes, approvals, brand replies, voice feedback → browser localStorage with full before/after activity history. Export/import from Settings.
 
-## Syncing new data from the sheet
+## Adding / updating deals (no sheet, no paste)
+
+New deals flow in two ways:
+
+1. **From Gmail** — Claude sweeps the inbox, extracts every brand reply, and writes the updates straight into `data/source/ui-export.csv`, then rebuilds + pushes. This is automatic on request ("sync the deals").
+2. **DM / off-email deals** — just tell Claude the details (or paste the ManyChat/IG thread) and it adds the deal directly.
+
+To rebuild after a manual edit:
 
 ```bash
-node scripts/sync.mjs        # re-pull UI Export from the Google Sheet
 node scripts/build-data.mjs  # validate + rebuild data/nv-data.js
-git commit -am "sync" && git push
+git commit -am "update deals" && git push
 ```
-
-Or just tell Claude in Cowork to "sync the deal sheet" — it reads every tab and pushes.
 
 ## Negotiating with Claude
 
-There's no API key in this app on purpose. Claude (in Cowork) is the copilot: it has this repo, the sheet, and the voice profile. Paste a brand's reply into the deal's Messages tab to log it, then ask Claude for the counter — it drafts in Aaron's voice, you approve, you send from Gmail.
+There's no API key in this app on purpose. Claude (in Cowork) is the copilot: it has this repo (the source of truth), Gmail, and the voice profile. Paste a brand's reply into the deal's Messages tab to log it, then ask Claude for the counter — it drafts in Aaron's voice, you approve, you send from Gmail.
 
 Guardrails that hold everywhere: no autonomous sending, no accepting offers, no perpetual usage, no AI-likeness/voice/training rights bundled into fees, no going below the $3,000 organic floor without an explicit `EXCEPTION REQUIRES AARON APPROVAL`.

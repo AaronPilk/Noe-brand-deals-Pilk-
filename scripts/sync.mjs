@@ -27,6 +27,24 @@ async function fetchCSV(tab, tq) {
   return text;
 }
 
+// ---------------------------------------------------------------------------
+// SOURCE OF TRUTH is now this repo (data/source/ui-export.csv) — NOT the sheet.
+// Pulling from the Google Sheet would OVERWRITE current deal data with a stale
+// copy, so this script is disabled by default. New deals flow in from Gmail
+// sweeps (Claude reads the inbox) + any DM deals you tell Claude to add; edit
+// data/source/ui-export.csv directly, then run: node scripts/build-data.mjs
+// If you truly need a one-time pull from the old sheet: node scripts/sync.mjs --from-sheet
+// ---------------------------------------------------------------------------
+if (!process.argv.includes('--from-sheet')) {
+  console.error(
+    '\n⛔ sync.mjs is disabled — the repo (data/source/ui-export.csv) is the source of truth now.' +
+      '\n   Pulling the sheet would overwrite current deals with a stale copy.' +
+      '\n   Add/edit deals in data/source/ui-export.csv, then: node scripts/build-data.mjs' +
+      '\n   One-time emergency pull from the old sheet: node scripts/sync.mjs --from-sheet\n',
+  );
+  process.exit(1);
+}
+
 console.log('Syncing from Google Sheet…');
 
 // UI Export is the normalized primary feed.
