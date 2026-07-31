@@ -412,35 +412,49 @@ textarea { resize: vertical; min-height: 74px; }
   .status-summary { gap: 8px; }
   .status-pill { flex: 1 1 44%; justify-content: flex-start; padding: 9px 12px; }
 
-  /* ---- Responsive tables: stack every row into a self-contained card (label:value pairs) ----
-     Fixes the horizontal double-scroll + clipped/blank cells on phones. No JS data model change:
-     data-label attributes are stamped onto each <td> at render time (see app.js labelTables). */
-  .tbl-wrap { overflow: visible; background: transparent; border: none; box-shadow: none; border-radius: 0; }
-  table.tbl { width: 100%; }
-  .tbl thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } /* visually-hidden headers */
-  .tbl tbody, .tbl tr, .tbl td { display: block; width: 100%; }
+  /* ---- Mobile deal cards: Apple-style card + 2-column stat grid + glowing status ring ----
+     Ring color carries meaning: purple = in pipeline (brand), green = accepted/won,
+     amber = needs reply, red = lost, neutral = cold. data-bucket sits on each <tr>;
+     data-label (stamped by app.js labelTables) drives the stat labels. */
+  html, body, .app, .main, .workspace, .tbl-wrap, table.tbl { max-width: 100%; overflow-x: hidden; }
+  .tbl-wrap { overflow: visible; background: transparent; border: none; box-shadow: none; border-radius: 0; -webkit-overflow-scrolling: touch; }
+  table.tbl, .tbl tbody { display: block; width: 100%; }
+  .tbl thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .tbl tbody tr {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg);
-    box-shadow: var(--shadow); padding: 4px 2px; margin-bottom: 12px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0 6px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
+    padding: 2px 6px 10px; margin-bottom: 14px; overflow: hidden;
   }
-  .tbl tbody tr:last-child td { border-bottom-color: var(--border); }
   .tbl td {
-    display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
-    padding: 9px 14px; text-align: right; white-space: normal; max-width: none !important;
-    border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 3px; align-items: flex-start;
+    padding: 9px 13px 3px; text-align: left; white-space: normal;
+    border: none; min-width: 0; overflow-wrap: anywhere; max-width: none !important;
+    font-size: 14.5px; font-weight: 600;
   }
-  .tbl td:last-child { border-bottom: none; }
   .tbl td::before {
-    content: attr(data-label); flex: 0 0 38%; text-align: left;
-    font-size: 10.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text-3);
+    content: attr(data-label); order: -1;
+    font-size: 9.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3);
   }
-  .tbl td:empty { display: none; } /* hide empty cells (e.g. blank Flags) so no blank bands */
-  .tbl td.money, .tbl td.num { text-align: right; }
-  /* First cell (brand + id) reads as the card title, full width, no label */
-  .tbl td:first-child { display: block; text-align: left; padding-top: 12px; }
+  .tbl td:empty { display: none; }
+  /* de-clutter: hide internal pricing columns on phones (keep the meaningful ones) */
+  .tbl td[data-label="Opening ask"], .tbl td[data-label="Floor"],
+  .tbl td[data-label="Our ask"], .tbl td[data-label="Gap"] { display: none; }
+  /* brand + id = card title, full width */
+  .tbl td:first-child { grid-column: 1 / -1; padding: 12px 14px 8px; font-size: 16px; border-bottom: 1px solid var(--border); margin-bottom: 2px; }
   .tbl td:first-child::before { display: none; }
-  .tbl-wrap { -webkit-overflow-scrolling: touch; }
+  /* long "next action" / notes = full width, lighter */
+  .tbl td:last-child { grid-column: 1 / -1; font-weight: 500; font-size: 12.5px; color: var(--text-2); }
+  .tbl .prob-bar { width: 100% !important; max-width: 130px; }
+
+  /* Glowing status rings (meaning-coded) */
+  .tbl tbody tr[data-bucket="accepted"]   { border-color: rgba(48,200,94,.55);   box-shadow: 0 0 0 1px rgba(48,200,94,.4),   0 0 20px rgba(48,200,94,.20); }
+  .tbl tbody tr[data-bucket="pipeline"]   { border-color: rgba(160,143,232,.6);   box-shadow: 0 0 0 1px rgba(160,143,232,.45), 0 0 22px rgba(160,143,232,.24); }
+  .tbl tbody tr[data-bucket="needsreply"] { border-color: rgba(232,151,58,.55);   box-shadow: 0 0 0 1px rgba(232,151,58,.4),   0 0 20px rgba(232,151,58,.20); }
+  .tbl tbody tr[data-bucket="lost"]       { border-color: rgba(255,93,99,.5);     box-shadow: 0 0 0 1px rgba(255,93,99,.3),    0 0 16px rgba(255,93,99,.14); opacity: .82; }
+  .tbl tbody tr[data-bucket="cold"]       { border-color: var(--border);          box-shadow: 0 1px 4px rgba(0,0,0,.45); }
+
   .board-col { min-width: 82vw; width: 82vw; }
+  .chip.purple { background: var(--purple-soft); color: var(--purple); }
   .draft-body { max-height: 50vh; }
   .draft-actions .btn { flex: 1 1 auto; justify-content: center; }
   .cmdk-overlay { padding-top: 6vh; }

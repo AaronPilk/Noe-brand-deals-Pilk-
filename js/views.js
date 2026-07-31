@@ -55,7 +55,7 @@ const isActionable = (d) => isViable(d) && !['Won', 'Paid', 'Declined', 'Do Not 
 const BUCKETS = {
   accepted:   { key: 'accepted',   label: 'Accepted / Won', short: 'Accepted',    chip: 'green',  dot: '#34c759' },
   needsreply: { key: 'needsreply', label: 'Needs Reply',    short: 'Needs reply', chip: 'amber',  dot: '#ff9f0a' },
-  pipeline:   { key: 'pipeline',   label: 'In Pipeline',    short: 'In pipeline', chip: 'blue',   dot: '#0071e3' },
+  pipeline:   { key: 'pipeline',   label: 'In Pipeline',    short: 'In pipeline', chip: 'purple', dot: '#a08fe8' },
   cold:       { key: 'cold',       label: 'Cold',           short: 'Cold',        chip: '',       dot: '#8e8e93' },
   lost:       { key: 'lost',       label: 'Lost',           short: 'Lost',        chip: 'red',    dot: '#ff453a' }
 };
@@ -236,7 +236,7 @@ function viewHome() {
       <thead><tr><th>Deal</th><th>Structure</th><th class="money">Their offer</th><th class="money">Opening ask</th><th class="money">Floor</th><th class="money">Weighted</th><th>Close prob</th><th>Next action</th></tr></thead>
       <tbody>
       ${topNegotiations.map((d) => `
-        <tr data-href="${dealLink(d.deal_id)}" ${rowClick}>
+        <tr data-bucket="${dealBucket(d)}" data-href="${dealLink(d.deal_id)}" ${rowClick}>
           <td><b>${esc(d.brand)}</b><br><span style="color:var(--text-3);font-size:11.5px">${esc(d.deal_id)}</span></td>
           <td>${structChip(d.commercial_structure)}</td>
           <td class="money">${d.explicit_cash_usd > 0 ? `<b>${fmt$(d.explicit_cash_usd)}</b>` : '<span style="color:var(--text-3)">None stated</span>'}</td>
@@ -381,7 +381,7 @@ function viewDeals(params) {
         list = [...list].sort((a, b) => rank(a) - rank(b) || num(b.prob_weighted_usd) - num(a.prob_weighted_usd));
         document.getElementById('f-count').textContent = `${list.length} of ${NV.deals.length}`;
         body.innerHTML = list.map((d) => `
-          <tr data-href="${dealLink(d.deal_id)}" ${rowClick}>
+          <tr data-bucket="${dealBucket(d)}" data-href="${dealLink(d.deal_id)}" ${rowClick}>
             <td><b>${esc(d.brand)}</b> ${chBadge(d.source_channel)}<br><span style="color:var(--text-3);font-size:11.5px">${esc(d.deal_id)}${d.agency ? ' · via ' + esc(d.agency.split(' (')[0]) : ''}</span></td>
             <td>${statusBadge(d)}</td>
             <td style="font-size:12.5px;color:var(--text-2)">${esc(d.ai_category)}</td>
@@ -955,7 +955,7 @@ function viewNegotiations() {
           const gap = d.explicit_cash_usd > 0 ? d.total_recommended_opening_ask - d.explicit_cash_usd : null;
           const ds = NVStore.getDraftStatus(d.deal_id);
           return `
-          <tr data-href="#/deal/${d.deal_id}?tab=negotiation" ${rowClick}>
+          <tr data-bucket="${dealBucket(d)}" data-href="#/deal/${d.deal_id}?tab=negotiation" ${rowClick}>
             <td><b>${esc(d.brand)}</b> ${chBadge(d.source_channel)}<br><span style="color:var(--text-3);font-size:11.5px">${esc(d.deal_id)}</span></td>
             <td>${gradeChip(d.grade)}</td>
             <td class="money">${d.explicit_cash_usd > 0 ? fmt$(d.explicit_cash_usd) : '<span style="color:var(--text-3)">—</span>'}</td>
