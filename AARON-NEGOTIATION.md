@@ -1,6 +1,45 @@
 # Aaron's Negotiation Style — Noe Varner Brand Deals
 
-How Aaron negotiates brand deals as Talent Manager for Noe Varner. Every quoted line is verbatim from his real sent mail (voice-raw.md, Jul 21–30 2026). This is the reasoning behind the numbers — for the drafting voice, see AARON-VOICE.md; for the full number bands and template skeletons, see NEGOTIATION-PLAYBOOK.md.
+How Aaron negotiates brand deals as Talent Manager for Noe Varner. Every quoted line is verbatim from his real sent mail (voice-raw.md + crm-sync3/voice-workflow.md, Jul 21–31 2026). This is the reasoning behind the numbers — for the drafting voice, see AARON-VOICE.md; for the full number bands and template skeletons, see NEGOTIATION-PLAYBOOK.md.
+
+---
+
+## Workflow: pitch → negotiate → Noe go/no-go → close-or-decline
+
+This is Aaron's actual end-to-end process, in his own words. An AI running this pipeline should move a deal through these five steps and stop at step 4 for a human decision.
+
+**Step 0 — Intake.** A brand or agency emails Noe. Noe forwards to Aaron or loops him in with his handoff line:
+> "Please continue communications with my management team — Aaron is head of all brand partnerships on my end, and I've copied him here. He'll take it from here."
+
+**Step 1 — Base-package pitch.** Aaron sends THE base-package email (the $10K-slot / $2,500-floor flagship, co-written with Noe — full verbatim in AARON-VOICE.md). Same email to nearly everyone. Purpose: anchor high-low and force a reply he can negotiate against. In his words: *"I send a base-level email saying these are our packages that Noe and I wrote together, I get them to reply."*
+
+**Step 2 — Negotiate to a firm number.** Once they engage, he trades on price, deliverables, deposit, exclusivity, and commission until there's a concrete committed offer on the table — ideally with an upfront/deposit attached. He'll flex below the $2,500 floor only for brands he rates, always with a named reason and a scope trade (see pattern catalog below). The goal of this step is a real number in hand, not open-ended interest.
+
+**Step 3 — Loop in Noe for go/no-go.** Before committing, Aaron takes the shaped deal to Noe. His framing line, repeated across threads:
+> "Noe took a look and [Brand] sits right in the lane his audience shows up for."
+
+In his words: *"then I send it over to Noe — if we feel like going forward we do; if not we say sorry, we've gone a different direction, we're not moving forward."* This is a genuine human gate: the deal is not closed until he and Noe decide it's worth doing.
+
+**Step 4a — Close (on yes).** If they go forward, he moves to paper fast:
+> "I can work with that. Can you send a full break down of the details? Then we can get agreements sent out and get this rolling." (FanBase/XBorg)
+> "I will accept that offer at $2,000 and the 6 months of free usage… Let me know if you would like to move forward." (Similarweb)
+
+**Step 4b — Decline (on no).** If he and Noe pass after negotiating, he closes it politely — the "gone a different direction" pass. His real language:
+> "Thanks for thinking of Noe on this one. It is not the right fit for his audience and content focus right now, so we will pass. I appreciate it." (Welax / Block Blast / INNOCN)
+> "No problem at all feel free to reach out anytime! Thanks!" (Buzzy)
+
+The AI's job is steps 1–2 (and drafting 4a/4b): get to a firm, committed offer so Aaron and Noe can make the go/no-go call at step 3.
+
+---
+
+## Money-in-hand principle
+
+Aaron wants a **firm number — ideally with a deposit or advance secured — before he and Noe decide go/no-go.** He is not weighing vague interest; he is weighing a concrete committed offer.
+
+- Push every negotiation toward a specific number + terms he can hold: *"I will accept that offer at $2,000 and the 6 months of free usage."*
+- Reward upfront money out loud so counterparts anchor on it: *"This is a well put together offer, the 50 percent advance and the 12 month affiliate layer work well."* (Fish Audio)
+- Default deposit ask secures skin in the game before he commits time: *"We require 50% deposit and remaining amount paid after video is agreed upon and posted."*
+- **Drafting rule for the AI:** never leave a live deal open-ended. Every negotiation reply should move toward pinning a number, a deliverable count, and payment terms — so what lands on Noe's desk is a real offer, not "they seem interested." If a brand is circling, make them name the number (*"let me know your maximum offer"*) rather than volunteering another discount.
 
 ---
 
@@ -103,6 +142,14 @@ And **authorization checks** on sketchy intermediaries: "Can you confirm you are
 - **Ads run from Noe's own Meta account with proof of spend** — a transparency lever, part of the five-slots frame: "ads run from our Meta account with monthly proof of spend."
 - **Default: hold 50% deposit for unknown agencies.** Consider contract-first/escrow only with a verifiable track record.
 
+**Securing upfront before committing (money-in-hand in practice):**
+- He actively rewards brands that front cash so it becomes the expected shape: *"the 50 percent advance and the 12 month affiliate layer work well"* (Fish Audio — praised an advance-heavy offer).
+- On a clean accept he still pins the number and term before signaling forward motion: *"I will accept that offer at $2,000 and the 6 months of free usage. Let me know if you would like to move forward."* (Similarweb).
+
+**Handling a no-upfront / pay-after-posting policy:**
+- Hold the deposit line first, don't fold to "company policy": *"We require 50% deposit and remaining amount paid after video is agreed upon and posted."*
+- **Flex only for verifiable, fast-paying agencies** — he accepted pay-on-go-live with no deposit from VidMuse (agency pays on delivery). He holds the line when a brand refuses any upfront AND wants off-channel/extra usage (Crazy Entrepreneur → stalled). Rule: no track record + no upfront = hold the deposit or pass.
+
 ---
 
 ## 8. Saying no — warm, floored, door open
@@ -156,6 +203,12 @@ Usage rights and exclusivity are **never bundled free** — they're separate lin
 | Wants to explore structures | Push to the call | "Yes, let's book a call. Here is our calendar link… Looking forward to meeting!" |
 | Low usage-rights ask | Unbundle, reprice separately | "The $250 covers a slice of the production, but the ask also includes 365 days of global ad usage, and those are two very different line items." |
 | Ready to close | Move to paper fast | "Can you send a full break down of the details? Then we can get agreements sent out and get this rolling." |
+| Firm number offered | Accept the number + term outright | "I will accept that offer at $2,000 and the 6 months of free usage. Let me know if you would like to move forward." |
+| Brand offers advance | Praise it, reinforce the shape | "This is a well put together offer, the 50 percent advance and the 12 month affiliate layer work well." |
+| Deal shaped, needs a decision | Run it past Noe (go/no-go) | "Noe took a look and [Brand] sits right in the lane his audience shows up for." |
+| He + Noe decide to pass | Polite "different direction" close | "Thanks for thinking of Noe on this one. It is not the right fit for his audience and content focus right now, so we will pass. I appreciate it." |
+| Inherited a messy deal | Reset warm, confirm scope, deliver | "Glad we're past all that. Confirmed on our end: 3 videos left in this batch. Here are the three concepts…" |
+| Brand won't front any money | Hold deposit unless track record | "We require 50% deposit and remaining amount paid after video is agreed upon and posted." |
 
 ---
 

@@ -2,13 +2,45 @@
 
 How Aaron writes brand-deal emails as Talent Manager for Noe Varner. Every rule below is grounded in a verbatim quote from his real sent mail (voice-raw.md, Jul 21–30 2026). Use this to draft a reply that sounds like him — or to check one that's supposed to.
 
-**Signs as:** "Aaron" alone on short replies; "— Aaron / Talent Manager, Noe Varner" or "Best, / Aaron / Talent Manager for Noe Varner" on templates. Real name on account: Aaron Pilkington.
+**Signs as:** "Aaron" alone on short replies; "— Aaron / Talent Manager, Noe Varner" or "Best, / Aaron / Talent Manager for Noe Varner" on templates. Also self-introduces "Aaron here. I manage Noe Varner's brand partnerships" on warm first-contact. Real name on account: Aaron Pilkington.
 
 ---
 
 ## The one-line version
 
 Sharp operator, not a hype man. Opens with a quick genuine acknowledgment, states the number as a fact, asks for one thing back, closes on a bare "Thanks!". No emojis, no corporate filler, no fake urgency. Keeps em-dashes.
+
+---
+
+## The base-package pitch email (his flagship opener — reuse verbatim)
+
+This is the email Aaron sends on nearly every new inbound. Noe and Aaron wrote it together. It's the anchor for the whole pipeline: send this first, get a reply, then negotiate. Swap `[Name]` and `[Brand]` per recipient (proofread both — the merge slips have burned him). Copy it as-is:
+
+> Hey [Name],
+>
+> Appreciate you reaching out about [Brand]. Quick context on how we work, because it's different from most creators you'll talk to:
+>
+> We don't do one-off promo posts, affiliate deals, or rotating brand features. Noe's audience is 110K+ followers and 600+ paying community members — almost all business owners actively buying AI tools — and we protect that trust by promoting exactly five companies, one per category, on long-term contracts.
+>
+> A partnership slot includes: link-in-bio for the life of the contract, ongoing content in Noe's native style, ads run from our Meta account with monthly proof of spend, category exclusivity, and a 3-month minimum. Slots start at $10K/month. If you're looking for a single sponsored video instead, those start at $2,500 and we take very few.
+>
+> Full details and current slot availability: noevarner.com/partners
+>
+> If your product genuinely fits what Noe would use himself and you're interested in one of the open slots, reply with the category you'd want and we'll set up a call.
+>
+> — Aaron
+> Talent Manager, Noe Varner
+
+**Follow-up variant (re-pitch on a reopened/older thread)** — same body, new first line:
+> Hey [Name], following up with where partnerships now stand on our end —
+> Appreciate you reaching out about [Brand]. Quick context on how we work…
+
+**Earlier warm/hand-written opener (per-brand, when a brief is thin)** — used to qualify before quoting:
+> Hi [Name],
+> Aaron here. I manage Noe Varner's brand partnerships, so rates and scheduling run through me. [Brand] sits right in the lane his audience shows up for. To put a real proposal together I need three things from you: the budget you are working with, the deliverables you want, and your timeline. You can see Noe's audience and past campaigns here: noevarner.com/partners. Send that over and I will come back with a clear proposal.
+> Best, Aaron — Talent Manager for Noe Varner
+
+*Why this is the opener: it anchors high-low ($10K slot / $2,500 floor) in one shot, leads with audience proof before any number, and ends on a single clear ask (name a category / send budget-deliverables-timeline). It's designed to force a reply he can then negotiate against.*
 
 ---
 
@@ -168,6 +200,38 @@ Pull from these — they're his real language:
 > That said, we don't do commission-only or CPM-only deals — full stop. Noe's content moves product for the brands he works with, and guaranteed base pay is how we protect the time and audience trust that makes that true.
 
 *Why it's him: genuine acknowledgment first, then a hard line with "full stop," explains WHY on principle, keeps the em-dash, "audience trust" value language.*
+
+**5. Accepting a firm number outright (money in hand)**
+> Hello Rachel,
+>
+> I will accept that offer at $2,000 and the 6 months of free usage. I agree it's best to start with a shorter commitment before moving to long-term deals, that makes more sense for you all. Let me know if you would like to move forward.
+>
+> Thanks!
+
+*Why it's him (Similarweb): "Hello" (money on the table), accepts a concrete number plus the usage term in one line, validates their logic ("that makes more sense for you all"), closes on a move-forward ask, bare "Thanks!". This is what "firm offer in hand" looks like — a real number and term he can take to Noe.*
+
+**6. Closing → move to paper**
+> Hey Sam,
+>
+> I can work with that. Can you send a full break down of the details? Then we can get agreements sent out and get this rolling. I would like more info on the affiliate side of things.
+>
+> Thanks!
+
+*Why it's him (FanBase/XBorg): "I can work with that" is his accept line; immediately pulls the deal toward a written breakdown + agreements ("get this rolling"), while flagging one open diligence item. Momentum verb, no dead end.*
+
+**7. Praising a strong offer (reinforce good terms)**
+> Hi Annie,
+>
+> Aaron here. This is a well put together offer, the 50 percent advance and the 12 month affiliate layer work well on our end.
+
+*Why it's him (Fish Audio): names the exact terms he likes — advance + affiliate — so the counterpart knows what a good deal looks like to him. He rewards upfront money and long affiliate tails out loud.*
+
+**8. Resetting an inherited deal after a bad prior manager**
+> Hi Brandon,
+>
+> Great to meet you too, and yeah, glad we're past all that. Confirmed on our end: 3 videos left in this batch. Here are the three concepts with the hooks we'd build them around.
+
+*Why it's him (Arcads): warm but brisk, owns the reset without over-apologizing ("glad we're past all that"), confirms the concrete scope ("3 videos left"), then delivers value immediately. Later closes the loop: "We will send the videos when they are done. Again, I apologize for the previous manager. We hope to grow this relationship! Thanks!"*
 
 ---
 
