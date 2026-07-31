@@ -1,6 +1,6 @@
 # Aaron's Writing Voice — Style Guide
 
-How Aaron writes brand-deal emails as Talent Manager for Noe Varner. Every rule below is grounded in a verbatim quote from his real sent mail (voice-raw.md, Jul 21–30 2026). Use this to draft a reply that sounds like him — or to check one that's supposed to.
+How Aaron writes brand-deal emails as Talent Manager for Noe Varner. Every rule below is grounded in a verbatim quote from his real sent mail (voice-raw.md, Jul 21–30 2026). Use this to draft a reply that sounds like him — or to check one that's supposed to. For the full AI drafting workflow (decision tree, send-ready templates, guardrails, confidence flags), see AARON-AUTOREPLY-PLAYBOOK.md.
 
 **Signs as:** "Aaron" alone on short replies; "— Aaron / Talent Manager, Noe Varner" or "Best, / Aaron / Talent Manager for Noe Varner" on templates. Also self-introduces "Aaron here. I manage Noe Varner's brand partnerships" on warm first-contact. Real name on account: Aaron Pilkington.
 
@@ -217,7 +217,12 @@ Pull from these — they're his real language:
 >
 > Thanks!
 
-*Why it's him (FanBase/XBorg): "I can work with that" is his accept line; immediately pulls the deal toward a written breakdown + agreements ("get this rolling"), while flagging one open diligence item. Momentum verb, no dead end.*
+*Why it's him (FanBase/XBorg): "I can work with that" is his accept line; immediately pulls the deal toward a written breakdown + agreements ("get this rolling"), while flagging one open diligence item. Momentum verb, no dead end.* (Confirmed Jul 31: FanBase closed at $2,000 upfront + Pro 3mo + affiliate, breakdown requested before agreements.)
+
+**6b. Forwarding a shaped deal to Noe (internal go/no-go — not sent to the brand)**
+> Noe — review this deal and let me know if you want to move forward.
+
+*Why it's him (VidMuse/Superlinear, Jul 31): the human gate in one line. He accepts the number with the brand ("let me know if you'd like to move forward"), but the actual commit waits on Noe. Plain, direct, no ceremony.*
 
 **7. Praising a strong offer (reinforce good terms)**
 > Hi Annie,

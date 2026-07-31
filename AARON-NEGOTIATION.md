@@ -1,6 +1,6 @@
 # Aaron's Negotiation Style — Noe Varner Brand Deals
 
-How Aaron negotiates brand deals as Talent Manager for Noe Varner. Every quoted line is verbatim from his real sent mail (voice-raw.md + crm-sync3/voice-workflow.md, Jul 21–31 2026). This is the reasoning behind the numbers — for the drafting voice, see AARON-VOICE.md; for the full number bands and template skeletons, see NEGOTIATION-PLAYBOOK.md.
+How Aaron negotiates brand deals as Talent Manager for Noe Varner. Every quoted line is verbatim from his real sent mail (voice-raw.md + crm-sync3/voice-workflow.md, Jul 21–31 2026). This is the reasoning behind the numbers — for the drafting voice, see AARON-VOICE.md; for the full number bands and template skeletons, see NEGOTIATION-PLAYBOOK.md; **for the AI auto-reply operating manual (input→output contract, decision tree, send-ready templates, guardrails), see AARON-AUTOREPLY-PLAYBOOK.md.**
 
 ---
 
@@ -18,7 +18,16 @@ This is Aaron's actual end-to-end process, in his own words. An AI running this 
 **Step 3 — Loop in Noe for go/no-go.** Before committing, Aaron takes the shaped deal to Noe. His framing line, repeated across threads:
 > "Noe took a look and [Brand] sits right in the lane his audience shows up for."
 
-In his words: *"then I send it over to Noe — if we feel like going forward we do; if not we say sorry, we've gone a different direction, we're not moving forward."* This is a genuine human gate: the deal is not closed until he and Noe decide it's worth doing.
+In his words: *"then I send it over to Noe — if we feel like going forward we do; if not we say sorry, we've gone a different direction, we're not moving forward."* This is a genuine human gate: the deal is not closed until he and Noe decide it's worth doing. His real forward line (VidMuse/Superlinear, Jul 31): *"review this deal and let me know if you want to move forward."*
+
+**Confirmed real outcomes (verified Jul 31 2026) — ground-truth decision examples:**
+- **Fancy Media** — accepted $5,000 (1 Reel + 30d ad code + 30d LIB + hashtags + 6mo retention); 20% via PayPal on client approval, 80% within 7 days after publish; confirmed structure, then loops Noe to ink.
+- **Similarweb** — accepted $2,000 + 6 months free platform usage for 1 test video; larger collab after the test performs.
+- **VidMuse/Superlinear** — accepted $1,200 first video (first-collab exception); brand *declined* the 3-for-$3,000 upsell (wants to see video 1 first); forwarded to Noe.
+- **Virlo** — accepted $1,000 + 20% commission (niche-fit exception below floor); asked "will you run ads on this" (paid usage reprices).
+- **FanBase/XBorg** — "I can work with that" to $2,000 upfront + Pro 3mo + affiliate; asked for full written breakdown before agreements.
+- **Betatron** — booked a call to compare the $10K/mo slot vs a one-off.
+- **Declines** — polite "gone a different direction" pass; TYPELESS held a $2,000 floor.
 
 **Step 4a — Close (on yes).** If they go forward, he moves to paper fast:
 > "I can work with that. Can you send a full break down of the details? Then we can get agreements sent out and get this rolling." (FanBase/XBorg)
@@ -149,6 +158,7 @@ And **authorization checks** on sketchy intermediaries: "Can you confirm you are
 **Handling a no-upfront / pay-after-posting policy:**
 - Hold the deposit line first, don't fold to "company policy": *"We require 50% deposit and remaining amount paid after video is agreed upon and posted."*
 - **Flex only for verifiable, fast-paying agencies** — he accepted pay-on-go-live with no deposit from VidMuse (agency pays on delivery). He holds the line when a brand refuses any upfront AND wants off-channel/extra usage (Crazy Entrepreneur → stalled). Rule: no track record + no upfront = hold the deposit or pass.
+- **Real closed split (Fancy Media, Jul 31):** accepted 20% via PayPal on client approval + 80% within 7 days after publish, on a named $5,000 package (1 Reel + 30d ad code + 30d LIB + hashtags + 6mo retention). A structured approval-then-publish split is acceptable when it's a named brand with a clear flow — 50% deposit remains the default for unknown agencies.
 
 ---
 
