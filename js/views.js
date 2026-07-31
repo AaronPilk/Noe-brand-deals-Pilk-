@@ -48,6 +48,38 @@ function dealStage(d) {
 const isViable = (d) => !['Do-not-engage', 'Decline/Archive'].includes(d.commercial_structure);
 const isActionable = (d) => isViable(d) && !['Won', 'Paid', 'Declined', 'Do Not Engage'].includes(dealStage(d));
 
+/* ---------------- STATUS BUCKETS (accepted vs pipeline vs needs-reply vs cold vs lost) ----------------
+   Reads the REAL sheet `status` column (previously ignored by the UI) and maps every deal into one of
+   five clear, colored buckets. An operational override (NVStore.getStage) still wins so Aaron can
+   hand-move a deal. This is what the summary bar, badges, status filter, sort, and pipeline use. */
+const BUCKETS = {
+  accepted:   { key: 'accepted',   label: 'Accepted / Won', short: 'Accepted',    chip: 'green',  dot: '#34c759' },
+  needsreply: { key: 'needsreply', label: 'Needs Reply',    short: 'Needs reply', chip: 'amber',  dot: '#ff9f0a' },
+  pipeline:   { key: 'pipeline',   label: 'In Pipeline',    short: 'In pipeline', chip: 'blue',   dot: '#0071e3' },
+  cold:       { key: 'cold',       label: 'Cold',           short: 'Cold',        chip: '',       dot: '#8e8e93' },
+  lost:       { key: 'lost',       label: 'Lost',           short: 'Lost',        chip: 'red',    dot: '#ff453a' }
+};
+const BUCKET_ORDER = ['accepted', 'needsreply', 'pipeline', 'cold', 'lost'];
+function dealBucket(d) {
+  const ops = NVStore.getStage(d.deal_id);
+  if (ops) {
+    const o = ops.toLowerCase();
+    if (/won|paid|verbal|accept|closing|contract/.test(o)) return 'accepted';
+    if (/declin|do not engage|lost|dead/.test(o)) return 'lost';
+    if (/negoti/.test(o)) return 'pipeline';
+    // neutral overrides ('New', 'Response Drafted') fall through to the real status below
+  }
+  const s = (d.status || '').toLowerCase();
+  if (/closed\s*-\s*won|closing\s*-\s*paperwork|verbal|accepted|\bwon\b/.test(s)) return 'accepted';
+  if (/declin|bounce|scam|closed\s*-\s*lost|dead|\blost\b/.test(s)) return 'lost';
+  if (/needs reply|new - inbound|new - low signal/.test(s)) return 'needsreply';
+  if (/negotiat|interested|call booked|counter|offer/.test(s)) return 'pipeline';
+  if (['Do-not-engage', 'Decline/Archive'].includes(d.commercial_structure)) return 'lost';
+  return 'cold'; // Pitched - Awaiting Reply, New, or blank
+}
+const statusBadge = (d) => { const b = BUCKETS[dealBucket(d)]; return `<span class="chip ${b.chip}" title="Status: ${b.label} (sheet status: ${esc(d.status || 'n/a')})">${b.short}</span>`; };
+function bucketCounts() { const c = { accepted: 0, needsreply: 0, pipeline: 0, cold: 0, lost: 0 }; NV.deals.forEach((d) => c[dealBucket(d)]++); return c; }
+
 function copyText(text, msg) {
   navigator.clipboard?.writeText(text).then(() => toast(msg || 'Copied'), () => toast('Copy failed'));
 }
@@ -261,13 +293,29 @@ function viewHome() {
 /* ---------------- DEALS LIST ---------------- */
 function viewDeals(params) {
   const filter = params.get('filter') || '';
+  const initBucket = params.get('bucket') || '';
+  const counts = bucketCounts();
+  const summaryBar = `
+      <div class="status-summary" id="status-summary">
+        ${BUCKET_ORDER.map((k) => `
+          <button class="status-pill ${k}" data-bucket="${k}" aria-pressed="false" title="Show ${BUCKETS[k].label} deals">
+            <span class="sp-dot" style="background:${BUCKETS[k].dot}"></span>
+            <span class="sp-n">${counts[k]}</span>
+            <span class="sp-l">${BUCKETS[k].label}</span>
+          </button>`).join('')}
+      </div>`;
   return {
     title: 'Deals',
     html: `
       <h1 class="page-title">Deals</h1>
       <div class="page-sub">All ${NV.deals.length} opportunities from the audit. Original audit facts are read-only; your working changes layer on top.</div>
+      ${summaryBar}
       <div class="filters">
         <input type="text" id="f-q" placeholder="Filter…" style="max-width:190px" />
+        <select id="f-bucket">
+          <option value="">Status: all</option>
+          ${BUCKET_ORDER.map((k) => `<option value="${k}" ${initBucket === k ? 'selected' : ''}>${BUCKETS[k].label}</option>`).join('')}
+        </select>
         <select id="f-grade"><option value="">Grade: all</option><option>B</option><option>C</option><option>D</option><option>Reject/Archive</option></select>
         <select id="f-struct"><option value="">Structure: all</option>${Object.keys(NV.dashboard.structureCounts).map((s) => `<option>${esc(s)}</option>`).join('')}</select>
         <select id="f-stage"><option value="">Stage: all</option>${STAGES.map((s) => `<option>${s}</option>`).join('')}</select>
@@ -293,17 +341,25 @@ function viewDeals(params) {
         <span class="count" id="f-count"></span>
       </div>
       <div class="tbl-wrap"><table class="tbl">
-        <thead><tr><th>Deal</th><th>Category</th><th>Grade</th><th>Stage</th><th class="money">Offer</th><th class="money">Opening ask</th><th class="money">Weighted</th><th>Prob</th><th>Days</th><th>Flags</th></tr></thead>
+        <thead><tr><th>Deal</th><th>Status</th><th>Category</th><th>Grade</th><th>Stage</th><th class="money">Offer</th><th class="money">Opening ask</th><th class="money">Weighted</th><th>Prob</th><th>Days</th><th>Flags</th></tr></thead>
         <tbody id="deals-body"></tbody>
       </table></div>`,
     mount() {
       const body = document.getElementById('deals-body');
-      const inputs = ['f-q', 'f-grade', 'f-struct', 'f-stage', 'f-channel', 'f-special'].map((id) => document.getElementById(id));
+      const inputs = ['f-q', 'f-bucket', 'f-grade', 'f-struct', 'f-stage', 'f-channel', 'f-special'].map((id) => document.getElementById(id));
+      const bucketSel = document.getElementById('f-bucket');
       const render = () => {
-        const [q, g, st, stage, ch, sp] = inputs.map((i) => i.value);
+        const [q, bk, g, st, stage, ch, sp] = inputs.map((i) => i.value);
         const ql = q.toLowerCase();
+        // reflect the active bucket on the summary pills
+        document.querySelectorAll('#status-summary .status-pill').forEach((p) => {
+          const on = p.dataset.bucket === bk;
+          p.classList.toggle('active', on);
+          p.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
         let list = NV.deals.filter((d) =>
           (!q || (d.brand + d.product + d.agency + d.contact_email + d.deal_id + ' ' + d.manychat_ids.map((m) => { const r = mcById(m); return r ? (r.ig || '') + ' ' + r.contact : ''; }).join(' ')).toLowerCase().includes(ql)) &&
+          (!bk || dealBucket(d) === bk) &&
           (!g || d.grade === g) &&
           (!st || d.commercial_structure === st) &&
           (!stage || dealStage(d) === stage) &&
@@ -320,11 +376,14 @@ function viewDeals(params) {
             sp === 'duplicate' ? mcForDeal(d.deal_id).some((m) => m.classification === 'Possible Duplicate') :
             sp === 'dmlink' ? mcForDeal(d.deal_id).some((m) => m.link) : true))
         );
-        list = [...list].sort((a, b) => num(b.prob_weighted_usd) - num(a.prob_weighted_usd));
+        // Accepted + Needs-reply float to the top, then pipeline, cold, lost; weighted value within each.
+        const rank = (d) => BUCKET_ORDER.indexOf(dealBucket(d));
+        list = [...list].sort((a, b) => rank(a) - rank(b) || num(b.prob_weighted_usd) - num(a.prob_weighted_usd));
         document.getElementById('f-count').textContent = `${list.length} of ${NV.deals.length}`;
         body.innerHTML = list.map((d) => `
           <tr data-href="${dealLink(d.deal_id)}" ${rowClick}>
             <td><b>${esc(d.brand)}</b> ${chBadge(d.source_channel)}<br><span style="color:var(--text-3);font-size:11.5px">${esc(d.deal_id)}${d.agency ? ' · via ' + esc(d.agency.split(' (')[0]) : ''}</span></td>
+            <td>${statusBadge(d)}</td>
             <td style="font-size:12.5px;color:var(--text-2)">${esc(d.ai_category)}</td>
             <td>${gradeChip(d.grade)}</td>
             <td style="font-size:12.5px">${esc(dealStage(d))}</td>
@@ -337,6 +396,13 @@ function viewDeals(params) {
           </tr>`).join('');
       };
       inputs.forEach((i) => i.addEventListener('input', render));
+      // Clicking a summary pill filters the list by that bucket (click again to clear).
+      document.querySelectorAll('#status-summary .status-pill').forEach((p) => {
+        p.addEventListener('click', () => {
+          bucketSel.value = bucketSel.value === p.dataset.bucket ? '' : p.dataset.bucket;
+          render();
+        });
+      });
       render();
     }
   };
@@ -344,21 +410,22 @@ function viewDeals(params) {
 
 /* ---------------- PIPELINE ---------------- */
 function viewPipeline() {
-  const cols = STAGES.map((s) => ({ stage: s, deals: NV.deals.filter((d) => dealStage(d) === s) })).filter((c) => c.deals.length || ['New', 'Response Drafted', 'In Negotiation', 'Won'].includes(c.stage));
+  // Board columns are the four real states (plus Lost), driven by the sheet status via dealBucket().
+  const cols = BUCKET_ORDER.map((k) => ({ b: BUCKETS[k], deals: NV.deals.filter((d) => dealBucket(d) === k) }));
   return {
     title: 'Pipeline',
     html: `
       <h1 class="page-title">Pipeline</h1>
-      <div class="page-sub">Stages update from the deal page and are kept separate from the imported audit. Weighted totals shown per column.</div>
+      <div class="page-sub">Every deal bucketed by its real status: Accepted, Needs reply, In pipeline, Cold, and Lost. Weighted totals shown per column.</div>
       <div class="board">
         ${cols.map((c) => `
-          <div class="board-col">
-            <h4>${esc(c.stage)} <span>${c.deals.length} · ${fmt$(c.deals.reduce((s, d) => s + (d.prob_weighted_usd || 0), 0))}</span></h4>
+          <div class="board-col bucket-${c.b.key}">
+            <h4><span class="bcol-title"><span class="sp-dot" style="background:${c.b.dot}"></span>${esc(c.b.label)}</span> <span>${c.deals.length} · ${fmt$(c.deals.reduce((s, d) => s + (d.prob_weighted_usd || 0), 0))}</span></h4>
             ${c.deals.sort((a, b) => num(b.prob_weighted_usd) - num(a.prob_weighted_usd)).map((d) => `
               <div class="board-card" onclick="location.hash='${dealLink(d.deal_id)}'">
                 <div class="bc-brand">${esc(d.brand)}</div>
                 <div class="bc-val">${d.explicit_cash_usd > 0 ? fmt$(d.explicit_cash_usd) + ' offered · ' : ''}${fmt$(d.prob_weighted_usd)} weighted</div>
-                <div class="bc-meta">${chBadge(d.source_channel)}${gradeChip(d.grade)}${d.legal_review === 'YES' ? '<span class="chip red">Legal</span>' : ''}${scamChip(d.scam_risk)}</div>
+                <div class="bc-meta">${statusBadge(d)}${chBadge(d.source_channel)}${gradeChip(d.grade)}${d.legal_review === 'YES' ? '<span class="chip red">Legal</span>' : ''}${scamChip(d.scam_risk)}</div>
               </div>`).join('') || '<div class="empty" style="padding:18px">Empty</div>'}
           </div>`).join('')}
       </div>`
@@ -657,6 +724,7 @@ function viewDealDetail(id, params) {
         <div class="deal-title">${esc(d.brand)}</div>
         <div class="deal-subtitle">${esc(d.product)} · ${esc(d.deal_id)}</div>
         <div class="deal-chips">
+          ${statusBadge(d)}
           ${chBadge(d.source_channel)}
           ${gradeChip(d.grade)}
           <span class="chip">${esc(d.priority)} priority</span>

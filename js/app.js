@@ -71,9 +71,36 @@ function renderRoute() {
   document.getElementById('crumbs').innerHTML = crumb;
   document.title = `${result.title} — Noe Varner Partnerships`;
   result.mount?.();
+  labelTables(container);
 }
 window.renderRoute = renderRoute;
 window.addEventListener('hashchange', renderRoute);
+
+/* Stamp each <td> with a data-label from its column header, so the mobile CSS can render
+   tables as label:value cards. Runs after every route render AND on any dynamic table
+   re-render (e.g. the Deals filter rebuilds its <tbody>), via a MutationObserver. */
+function labelTables(root) {
+  root.querySelectorAll('table.tbl').forEach((tbl) => {
+    const heads = [...tbl.querySelectorAll('thead th')].map((th) => th.textContent.trim());
+    if (!heads.length) return;
+    tbl.querySelectorAll('tbody tr').forEach((tr) => {
+      [...tr.children].forEach((td, i) => {
+        if (heads[i] != null && td.getAttribute('data-label') !== heads[i]) td.setAttribute('data-label', heads[i]);
+      });
+    });
+  });
+}
+(function watchTables() {
+  const view = document.getElementById('view');
+  if (!view || !window.MutationObserver) return;
+  let queued = false;
+  const obs = new MutationObserver(() => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; labelTables(view); });
+  });
+  obs.observe(view, { childList: true, subtree: true });
+})();
 
 /* ---------- command menu ---------- */
 const CmdK = (() => {
