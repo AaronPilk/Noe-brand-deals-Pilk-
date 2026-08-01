@@ -83,9 +83,10 @@ const warnings = [];
 //   label reconciled (Similarweb/VidMuse-Superlinear/FanBase -> Closing - Paperwork; Betatron call
 //   booked; Virlo held pending acceptance verification; Voiskey + Higgsfield/Heek reactivated as
 //   needs-reply). Meet August (0061) + TicNote (0043) closed-lost. Followups +2 (0108, 0119) -> 90.
-if (deals.length !== 119) errors.push(`Expected 119 deals, got ${deals.length}`);
+// 2026-08-01 nightly sync: +1 new inbound — Drafted (0120, Ben Bowden, needs-reply). No other post-Jul31-18:00 movement.
+if (deals.length !== 120) errors.push(`Expected 120 deals, got ${deals.length}`);
 const maxId = ids.map((i) => +i.slice(-4)).sort((a, b) => b - a)[0];
-if (maxId !== 119) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0119`);
+if (maxId !== 120) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0120`);
 if (dupes.length) errors.push(`Duplicate deal ids: ${dupes.join(', ')}`);
 for (const d of deals) {
   if (!/^NV-DEAL-\d{4}$/.test(d.deal_id)) errors.push(`Bad id: ${d.deal_id}`);
