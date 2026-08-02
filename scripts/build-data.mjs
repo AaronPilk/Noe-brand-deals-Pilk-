@@ -87,9 +87,11 @@ const warnings = [];
 // 2026-08-01 update: +5 new inbound leads Aaron engaged Jul 31 — Tesana (0121, AI gaming, per-view payout),
 //   Accio Work/Alibaba via ActiVibe (0122), PixVerse via Peartechs (0123), unnamed AI-design via Gridsocial (0124),
 //   Adens Lab affiliate (0125). All Pitched-Awaiting-Reply. Betatron (0111) note: David moved collab to Slack (Y CORP #betatron).
-if (deals.length !== 125) errors.push(`Expected 125 deals, got ${deals.length}`);
+// 2026-08-02 full inbox sweep: Similarweb (0076) CLOSED-WON (Aug 2 platform access + brief delivered, $2k + 6mo usage);
+//   +1 new brand Temu via JellyOtter/influxsaga (0126, needs-reply, 3 IG Reels); VidMuse/Superlinear (0115) $1,200 accepted, agreement drafting.
+if (deals.length !== 126) errors.push(`Expected 126 deals, got ${deals.length}`);
 const maxId = ids.map((i) => +i.slice(-4)).sort((a, b) => b - a)[0];
-if (maxId !== 125) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0125`);
+if (maxId !== 126) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0126`);
 if (dupes.length) errors.push(`Duplicate deal ids: ${dupes.join(', ')}`);
 for (const d of deals) {
   if (!/^NV-DEAL-\d{4}$/.test(d.deal_id)) errors.push(`Bad id: ${d.deal_id}`);
