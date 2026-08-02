@@ -84,9 +84,12 @@ const warnings = [];
 //   booked; Virlo held pending acceptance verification; Voiskey + Higgsfield/Heek reactivated as
 //   needs-reply). Meet August (0061) + TicNote (0043) closed-lost. Followups +2 (0108, 0119) -> 90.
 // 2026-08-01 nightly sync: +1 new inbound — Drafted (0120, Ben Bowden, needs-reply). No other post-Jul31-18:00 movement.
-if (deals.length !== 120) errors.push(`Expected 120 deals, got ${deals.length}`);
+// 2026-08-01 update: +5 new inbound leads Aaron engaged Jul 31 — Tesana (0121, AI gaming, per-view payout),
+//   Accio Work/Alibaba via ActiVibe (0122), PixVerse via Peartechs (0123), unnamed AI-design via Gridsocial (0124),
+//   Adens Lab affiliate (0125). All Pitched-Awaiting-Reply. Betatron (0111) note: David moved collab to Slack (Y CORP #betatron).
+if (deals.length !== 125) errors.push(`Expected 125 deals, got ${deals.length}`);
 const maxId = ids.map((i) => +i.slice(-4)).sort((a, b) => b - a)[0];
-if (maxId !== 120) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0120`);
+if (maxId !== 125) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0125`);
 if (dupes.length) errors.push(`Duplicate deal ids: ${dupes.join(', ')}`);
 for (const d of deals) {
   if (!/^NV-DEAL-\d{4}$/.test(d.deal_id)) errors.push(`Bad id: ${d.deal_id}`);
