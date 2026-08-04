@@ -89,9 +89,13 @@ const warnings = [];
 //   Adens Lab affiliate (0125). All Pitched-Awaiting-Reply. Betatron (0111) note: David moved collab to Slack (Y CORP #betatron).
 // 2026-08-02 full inbox sweep: Similarweb (0076) CLOSED-WON (Aug 2 platform access + brief delivered, $2k + 6mo usage);
 //   +1 new brand Temu via JellyOtter/influxsaga (0126, needs-reply, 3 IG Reels); VidMuse/Superlinear (0115) $1,200 accepted, agreement drafting.
-if (deals.length !== 126) errors.push(`Expected 126 deals, got ${deals.length}`);
+// 2026-08-03 nightly sync: +3 new inbound leads Aaron engaged Aug 3 -> EurekaMind via PartnerBoost (0127),
+//   Stics Media multi-brand (0128), AHA Creators Agency multi-brand (0129). All Pitched-Awaiting-Reply.
+//   Updates: Similarweb (0076) kickoff in motion (Docusign contract out, script-first, 'similarweb' lowercase);
+//   Arcads (0119) Brandon warm, 3 drafts owed; Gridsocial (0124) new contact Alice; Temu (0126) Needs-Reply -> Pitched (Aaron replied); Skywork (0056) OOO auto-reply.
+if (deals.length !== 129) errors.push(`Expected 129 deals, got ${deals.length}`);
 const maxId = ids.map((i) => +i.slice(-4)).sort((a, b) => b - a)[0];
-if (maxId !== 126) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0126`);
+if (maxId !== 129) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0129`);
 if (dupes.length) errors.push(`Duplicate deal ids: ${dupes.join(', ')}`);
 for (const d of deals) {
   if (!/^NV-DEAL-\d{4}$/.test(d.deal_id)) errors.push(`Bad id: ${d.deal_id}`);
