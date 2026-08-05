@@ -93,9 +93,9 @@ const warnings = [];
 //   Stics Media multi-brand (0128), AHA Creators Agency multi-brand (0129). All Pitched-Awaiting-Reply.
 //   Updates: Similarweb (0076) kickoff in motion (Docusign contract out, script-first, 'similarweb' lowercase);
 //   Arcads (0119) Brandon warm, 3 drafts owed; Gridsocial (0124) new contact Alice; Temu (0126) Needs-Reply -> Pitched (Aaron replied); Skywork (0056) OOO auto-reply.
-if (deals.length !== 129) errors.push(`Expected 129 deals, got ${deals.length}`);
+if (deals.length !== 138) errors.push(`Expected 138 deals, got ${deals.length}`);
 const maxId = ids.map((i) => +i.slice(-4)).sort((a, b) => b - a)[0];
-if (maxId !== 129) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0129`);
+if (maxId !== 138) errors.push(`Max deal id NV-DEAL-0${maxId}, expected NV-DEAL-0138`);
 if (dupes.length) errors.push(`Duplicate deal ids: ${dupes.join(', ')}`);
 for (const d of deals) {
   if (!/^NV-DEAL-\d{4}$/.test(d.deal_id)) errors.push(`Bad id: ${d.deal_id}`);
